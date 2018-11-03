@@ -1,0 +1,12 @@
+1) Investigating aton signals present in ais_data:
+	we want:
+		>types of atons
+		>which aton is most common
+		>order by significance (count)
+
+select distinct count(*), ais_data.dynamic_aton.typeofaid, ais_status_codes_types.aton.definition
+	from ais_data.dynamic_aton, ais_status_codes_types.aton
+	where ais_status_codes_types.aton.id_code=ais_data.dynamic_aton.typeofaid
+	group by ais_data.dynamic_aton.typeofaid,ais_status_codes_types.aton.definition
+	order by count(*) ;
+
