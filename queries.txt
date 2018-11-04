@@ -72,4 +72,16 @@ where shiptype between shiptype_min and shiptype_max and type_name like 'Cargo%'
 	from ais_data.static_ships,  ais_status_codes_types.ship_types
 	where shiptype between shiptype_min and shiptype_max 
 	group by type_name
+10) In which three month time there are more messages
+ messages from 10 - 11 - 12
 
+	select count(dynamic_ships.mmsi)
+	from ais_data.dynamic_ships
+	where ts > 1443657601 and ts < 1451520001
+Results: 9047313
+
+messages from 1 - 2 - 3
+	select count(dynamic_ships.mmsi)
+	from ais_data.dynamic_ships
+	where ts > 1451606401 and ts < 1459382401
+Results: 9808823
