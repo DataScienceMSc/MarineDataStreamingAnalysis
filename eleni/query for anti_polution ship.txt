@@ -1,0 +1,1 @@
+1) select * from ais_data.dynamic_ships where mmsi = 228064900
