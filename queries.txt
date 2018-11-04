@@ -66,3 +66,10 @@ where shiptype between shiptype_min and shiptype_max and type_name like 'Cargo%'
 	where substring(cast(sourcemmsi as varchar),1,3) = country_code::text)
 	order by sourcemmsi
 
+9) percentage of messages per type of ship
+
+	select (cast(count(sourcemmsi) as FLOAT)/1078617)*100, ship_types.type_name
+	from ais_data.static_ships,  ais_status_codes_types.ship_types
+	where shiptype between shiptype_min and shiptype_max 
+	group by type_name
+
