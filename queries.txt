@@ -15,4 +15,37 @@ select distinct count(*), ais_data.dynamic_aton.typeofaid, ais_status_codes_type
 
 select ...
 
-3) 
+3) Find ships' avg, min, max speed: 
+
+	select avg(speed), max(speed), min(speed)
+	from ais_data.dynamic_ships
+	where speed > 0;
+
+avg 		  max	min
+15.7915488991632; 102.3; 0.1
+
+4) ToDo: na eisagoume sto where an vrisketai se limani h oxi
+	select distinct (mmsi), lat, lon
+	from ais_data.dynamic_ships
+	where speed = 0;
+
+
+5) The cargo vessels that do not have load:
+
+	select distinct sourcemmsi, ship_types.type_name
+from ais_data.static_ships,  ais_status_codes_types.ship_types
+where shiptype between shiptype_min and shiptype_max and type_name like 'Cargo%' and draught = 0;
+
+6) How many vessels are routed to Brest's port and how many are just passing or beginning from Brest's port
+
+	select count (distinct sourcemmsi)
+	from ais_data.static_ships
+	where destination LIKE 'BREST%'
+	
+	Result: 194 vessels
+
+	select count (distinct sourcemmsi)
+	from ais_data.static_ships
+	where destination not LIKE 'BREST%'
+
+	Result: 4431 vessels
