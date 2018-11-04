@@ -49,3 +49,16 @@ where shiptype between shiptype_min and shiptype_max and type_name like 'Cargo%'
 	where destination not LIKE 'BREST%'
 
 	Result: 4431 vessels
+
+7) Find the origin of ships
+
+	select distinct(sourcemmsi), country
+	from ais_data.static_ships, ais_status_codes_types.mmsi_country_codes
+	where substring(cast(sourcemmsi as varchar),3,3) = country_code::text
+
+8)There are many ships that has no origin
+
+	select distinct(sourcemmsi) from ais_data.static_ships where sourcemmsi not in 		(select distinct(sourcemmsi)
+	from ais_data.static_ships, ais_status_codes_types.mmsi_country_codes
+	where substring(cast(sourcemmsi as varchar),3,3) = country_code::text)
+	order by sourcemmsi
