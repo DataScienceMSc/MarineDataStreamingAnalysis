@@ -13,7 +13,10 @@ select distinct count(*), ais_data.dynamic_aton.typeofaid, ais_status_codes_type
 
 2) Find count of ships with different types 
 
-select ...
+	select count(distinct sourcemmsi), ship_types.type_name
+	from ais_data.static_ships,  ais_status_codes_types.ship_types
+	where shiptype between shiptype_min and shiptype_max 
+	group by type_name
 
 3) Find ships' avg, min, max speed: 
 
