@@ -10,3 +10,9 @@ select distinct count(*), ais_data.dynamic_aton.typeofaid, ais_status_codes_type
 	group by ais_data.dynamic_aton.typeofaid,ais_status_codes_types.aton.definition
 	order by count(*) ;
 
+
+2) Find count of ships with different types 
+
+select ...
+
+3) 
