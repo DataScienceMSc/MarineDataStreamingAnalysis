@@ -85,3 +85,21 @@ messages from 1 - 2 - 3/2016
 	from ais_data.dynamic_ships
 	where ts > 1451606401 and ts < 1459382401
 Results: 9808823
+
+
+
+11)Number of unique ships in Natura areas (france)
+
+with cte as 
+(
+    select * from ais_data.dynamic_ships LIMIT 100000
+)
+
+select  count (distinct cte.mmsi)
+from natura2000.spatialfeatures, natura2000.sites, cte  where
+natura2000.spatialfeatures.sitecode=natura2000.sites.sitecode and natura2000.sites.country_code='fr'
+and ST_Contains(natura2000.spatialfeatures.geom,ST_Transform(cte.geom,3035))=true;
+Results:64
+
+** Note: If the limit is removed, then the command will run for all rows in ais_data.dynamic_ships
+
