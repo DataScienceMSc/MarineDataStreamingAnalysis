@@ -62,3 +62,9 @@ where shiptype between shiptype_min and shiptype_max and type_name like 'Cargo%'
 	from ais_data.static_ships, ais_status_codes_types.mmsi_country_codes
 	where substring(cast(sourcemmsi as varchar),3,3) = country_code::text)
 	order by sourcemmsi
+
+9) Military ships
+
+	select distinct sourcemmsi, ship_types.type_name
+	from ais_data.static_ships,  ais_status_codes_types.ship_types
+	where type_name like 'Military%' 
