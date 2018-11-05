@@ -124,3 +124,33 @@ Results:12
 
 Results:
 
+15) How many fishing ships are in fishing areas during 7 hours
+	select count(distinct oneDAy1000.mmsi)
+	from ais_data.oneDay1000, ais_data.oneDayStatic,  ais_status_codes_types.ship_types, 		geographic_features.fishing_areas_eu
+	where shiptype between shiptype_min and shiptype_max and type_name like 'Fishing%' and 		sourcemmsi = oneDay1000.mmsi and oneDAy1000.lat between minlat and maxlat and 			oneDAy1000.lon between fishing_areas_eu.minlong and fishing_areas_eu.maxlong;
+	
+	REsult: 11
+16) Which ships where fishing:
+	select distinct oneDAy1000.mmsi
+	from ais_data.oneDay1000, ais_data.oneDayStatic,  ais_status_codes_types.ship_types, 		geographic_features.fishing_areas_eu
+	where shiptype between shiptype_min and shiptype_max and type_name like 'Fishing%' and 		sourcemmsi = oneDay1000.mmsi and oneDAy1000.lat between minlat and maxlat and 			oneDAy1000.lon between fishing_areas_eu.minlong and fishing_areas_eu.maxlong;
+	
+
+Result: 227303430
+227315110
+227322670
+227611930
+227632830
+227639660
+227640710
+227641920
+227650230
+227654220
+228210800
+
+17) How many different types of ships there are:
+	select count(distinct(type_name)) from ais_status_codes_types.ship_types;
+
+	Result: 31
+
+
