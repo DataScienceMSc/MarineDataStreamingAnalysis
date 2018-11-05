@@ -88,10 +88,10 @@ Results: 9808823
 
 11)Number of unique ships in Natura areas (france)
 
-with cte as 
-(
-    select * from ais_data.dynamic_ships LIMIT 100000
-)
+	with cte as 
+	(
+		select * from ais_data.dynamic_ships LIMIT 100000
+	)
 
 	select  count (distinct cte.mmsi)
 	from natura2000.spatialfeatures, natura2000.sites, cte  where
@@ -107,4 +107,20 @@ Results:
 	Physical Atons->480458 
 	**Note** Physical Atons are:Lighthouses,beacons(they send navigational information)
 		 Virtual Atons:authority transmits navigational information where no physical aton exists (broadcast messages or messages targeted to a specific vessel/mmsi)
+
+13)Number of vessels in fishing areas(europe):
+        with cte as
+        (
+                select * from ais_data.dynamic_ships LIMIT 10000
+        )
+
+        select  count(distinct mmsi)
+        from geographic_features.fishing_areas_eu, cte  where
+        ST_Contains(geographic_features.fishing_areas_eu.geom,ST_Transform(cte.geom,4326))=true;
+Results:12
+
+14)Number of ships in fishing areas that have no fishing registration
+
+
+Results:
 
