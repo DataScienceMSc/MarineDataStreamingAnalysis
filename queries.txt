@@ -153,4 +153,50 @@ Result: 227303430
 
 	Result: 31
 
+18)The newest/olderst ships:
+**USING LIMIT**
+**The age of a ship is based on the day of first license
+	YOUNGEST SHIPS:
+	---------------
+	with cte as
+	(	
+		select * from ais_data.dynamic_ships LIMIT 1000000
+	)
+
+	select fr.mmsi,to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp
+	from vesselregister.anfr_vessel_list as fr
+	where fr.mmsi is not null 
+		and to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp=
+			(select max(to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp) from 
+			vesselregister.anfr_vessel_list as fr, cte	
+			where fr.mmsi=cte.mmsi);
+	Result_file:query_18_youngest_ships.csv
+
+	OLDEST SHIPS:
+	------------
+	with cte as
+	(
+		select * from ais_data.dynamic_ships LIMIT 1000000
+	)
+
+	select fr.mmsi,to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp
+	from vesselregister.anfr_vessel_list as fr
+	where fr.mmsi is not null 
+		and to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp=
+			(select min(to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp) from 
+			vesselregister.anfr_vessel_list as fr, cte	
+			where fr.mmsi=cte.mmsi);
+	Result_file: query_18_oldest_ships.csv
+
+19)Ships that are older than 40 years old (based on first registration)
+	with cte as
+	(
+		select * from ais_data.dynamic_ships LIMIT 1000000
+	)
+
+	select count (distinct mmsi)
+	from vesselregister.anfr_vessel_list as fr
+	where  date_part('year',age(now(), to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp))>40
+		and fr.mmsi is not null;
+	Result:385 ships are older than 40 years old.
 
