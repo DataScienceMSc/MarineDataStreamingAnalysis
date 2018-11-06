@@ -120,9 +120,21 @@ Results:
 Results:12
 
 14)Number of ships in fishing areas that have no fishing registration
+	with cte as
+	(
+		select * from ais_data.dynamic_ships LIMIT 50000
+	)
 
+	select fr.mmsi,to_timestamp(cte.ts) AT TIME ZONE 'UTC +1', to_date(eu.eventstartdate::text,'YYYYMMDD')::timestamp,
+	to_date(eu.eventenddate::text,'YYYYMMDD')::timestamp 
+	from vesselregister.eu_fishingvessels as eu, vesselregister.anfr_vessel_list as fr,cte,
+	geographic_features.fishing_areas_eu as fish
+	where eu.licenseind='N' and eu.vesselname=fr.ship_name and cte.mmsi=fr.mmsi 
+	and to_timestamp(cte.ts)>=to_date(eu.eventstartdate::text,'YYYYMMDD')::timestamp
+	and to_timestamp(cte.ts)<=to_date(eu.eventenddate::text,'YYYYMMDD')::timestamp
+	and ST_Contains(fish.geom,ST_Transform(cte.geom,4326))=true;
 
-Results:
+Results: FOR LIMIT 50000 rows from ais_data.dynamic_ships, no entries returned, meaning no ships without a registration in fishing areas
 
 15) How many fishing ships are in fishing areas during 7 hours
 	select count(distinct oneDAy1000.mmsi)
