@@ -1,0 +1,6 @@
+1) select * from ais_data.dynamic_ships where mmsi = 228064900
+
+2) select count(mmsi) from ais_data.dynamic_ships where speed = 0;
+     result: 8.203.254
+
+3) select distinct(mmsi) from ais_data.dynamic_ships where speed > 80;
