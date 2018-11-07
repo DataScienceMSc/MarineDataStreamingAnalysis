@@ -212,3 +212,34 @@ Result: 227303430
 		and fr.mmsi is not null;
 	Result:385 ships are older than 40 years old.
 
+20)Number of ships that are present in "static_data" but not present in ANFR registrations:
+	with static as
+	(
+		select * from ais_data.static_ships LIMIT 10000
+	)
+
+
+	select count(distinct static.sourcemmsi)
+	from ais_data.static_ships as static
+	where static.sourcemmsi  not in(
+		select fr.mmsi 
+		from static, vesselregister.anfr_vessel_list as fr
+		where fr.mmsi= static.sourcemmsi and static.sourcemmsi is not null)
+	Result:4755
+
+21)Average Number of messages per day
+	select count(*)/183
+	from ais_data.dynamic_ships as cte 
+	where extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')>8
+	and extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')<20
+Results:51729
+
+22)Average Number of messages per day
+	select count(*)
+	from ais_data.dynamic_ships as cte 
+	where (extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')<8 
+		and extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')>=0)
+	or (extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')>20
+		and extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')<=23)
+Results:43277
+
