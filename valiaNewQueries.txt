@@ -1,0 +1,267 @@
+1) How many different types of ships there are:
+	select distinct(type_name) from ais_status_codes_types.ship_types;
+
+	see types of ships csv in folder
+	Result: 31 
+
+
+2) Find count of ships with different types 
+
+	select count(distinct sourcemmsi), ship_types.type_name
+	from ais_data.static_ships,  ais_status_codes_types.ship_types
+	where shiptype between shiptype_min and shiptype_max 
+	group by type_name
+
+
+3)Investigating aton signals present in ais_data:
+	we want:
+		>types of atons
+		>which aton is most common
+		>order by significance (count)
+
+	select distinct count(*), ais_data.dynamic_aton.typeofaid, ais_status_codes_types.aton.definition
+	from ais_data.dynamic_aton, ais_status_codes_types.aton
+	where ais_status_codes_types.aton.id_code=ais_data.dynamic_aton.typeofaid
+	group by ais_data.dynamic_aton.typeofaid,ais_status_codes_types.aton.definition
+	order by count(*) ;
+
+
+4) HOw many SAR ships:
+	select count (distinct mmsi) from ais_data.dynamic_sar
+	
+	Result:10
+
+5) Find ships' avg, min, max speed: 
+
+	select avg(speed), max(speed), min(speed)
+	from ais_data.dynamic_ships
+	where speed > 0;
+
+Result:
+avg 		  max	min
+15.7915488991632; 102.3; 0.1
+
+6) Find SARs' avg, min, max speed: 
+	select avg(speed), max(speed), min(speed)
+	from ais_data.dynamic_sar
+	where speed > 0;
+Result:
+avg 		  max	min
+164.981123171307  ;353  ;1
+
+7) Find messages of ships vs sars vs atons:
+SArs: 4566 
+ships: 19035630
+atons: 505717
+
+8) which ships have speed  0:
+	select distinct (mmsi), lat, lon
+	from ais_data.dynamic_ships
+	where speed = 0;
+
+
+9) The cargo vessels that do not have load:
+
+	select distinct sourcemmsi, ship_types.type_name
+from ais_data.static_ships,  ais_status_codes_types.ship_types
+where shiptype between shiptype_min and shiptype_max and type_name like 'Cargo%' and draught = 0;
+
+10) How many vessels are routed to Brest's port and how many are just passing or beginning from Brest's port
+
+	select count (distinct sourcemmsi)
+	from ais_data.static_ships
+	where destination LIKE 'BREST%'
+	
+	Result: 194 vessels
+
+	select count (distinct sourcemmsi)
+	from ais_data.static_ships
+	where destination not LIKE 'BREST%'
+
+	Result: 4431 vessels
+
+11) Find the origin of ships
+
+	select distinct(sourcemmsi), country
+	from ais_data.static_ships, ais_status_codes_types.mmsi_country_codes
+	where substring(cast(sourcemmsi as varchar),1,3) = country_code::text
+
+12)There are many ships that has no origin
+
+	select distinct(sourcemmsi) from ais_data.static_ships where sourcemmsi not in 		(select distinct(sourcemmsi)
+	from ais_data.static_ships, ais_status_codes_types.mmsi_country_codes
+	where substring(cast(sourcemmsi as varchar),1,3) = country_code::text)
+	order by sourcemmsi
+
+13) percentage of messages per type of ship
+
+	select (cast(count(sourcemmsi) as FLOAT)/1078617)*100, ship_types.type_name
+	from ais_data.static_ships,  ais_status_codes_types.ship_types
+	where shiptype between shiptype_min and shiptype_max 
+	group by type_name
+
+
+14) In which three month time there are more messages
+ messages from 10 - 11 - 12/2015
+
+	select count(dynamic_ships.mmsi)
+	from ais_data.dynamic_ships
+	where ts > 1443657601 and ts < 1451520001
+Results: 9047313
+
+messages from 1 - 2 - 3/2016
+	select count(dynamic_ships.mmsi)
+	from ais_data.dynamic_ships
+	where ts > 1451606401 and ts < 1459382401
+Results: 9808823
+
+15)Number of unique ships in Natura areas (france)
+
+	with cte as 
+	(
+		select * from ais_data.dynamic_ships LIMIT 100000
+	)
+
+	select  count (distinct cte.mmsi)
+	from natura2000.spatialfeatures, natura2000.sites, cte  where
+	natura2000.spatialfeatures.sitecode=natura2000.sites.sitecode and natura2000.sites.country_code='fr'
+	and ST_Contains(natura2000.spatialfeatures.geom,ST_Transform(cte.geom,3035))=true;
+Results:64 ** Note: If the limit is removed, then the command will run for all rows in ais_data.dynamic_ships
+
+16)Number of messages of virtual/physical Atons:
+	select VirtualAtons,PhysicalAtons from (select count(*) from ais_data.dynamic_aton where virtual=true) as VirtualAtons,
+	(select count(*) from ais_data.dynamic_aton where virtual=false) as PhysicalAtons;
+Results: 
+	Virtual Atons->25259
+	Physical Atons->480458 
+	**Note** Physical Atons are:Lighthouses,beacons(they send navigational information)
+		 Virtual Atons:authority transmits navigational information where no physical aton exists (broadcast messages or messages targeted to a specific vessel/mmsi)
+
+17)Number of vessels in fishing areas(europe):
+        with cte as
+        (
+                select * from ais_data.dynamic_ships LIMIT 10000
+        )
+
+        select  count(distinct mmsi)
+        from geographic_features.fishing_areas_eu, cte  where
+        ST_Contains(geographic_features.fishing_areas_eu.geom,ST_Transform(cte.geom,4326))=true;
+Results:12
+18) Number of messages from above vessels:
+
+        with cte as
+        (
+                select * from ais_data.dynamic_ships LIMIT 10000
+        )
+
+        select  count(mmsi)
+        from geographic_features.fishing_areas_eu, cte  where
+        ST_Contains(geographic_features.fishing_areas_eu.geom,ST_Transform(cte.geom,4326))=true;
+
+
+
+19)Number of ships in fishing areas that have no fishing registration
+	with cte as
+	(
+		select * from ais_data.dynamic_ships LIMIT 50000
+	)
+
+	select fr.mmsi,to_timestamp(cte.ts) AT TIME ZONE 'UTC +1', to_date(eu.eventstartdate::text,'YYYYMMDD')::timestamp,
+	to_date(eu.eventenddate::text,'YYYYMMDD')::timestamp 
+	from vesselregister.eu_fishingvessels as eu, vesselregister.anfr_vessel_list as fr,cte,
+	geographic_features.fishing_areas_eu as fish
+	where eu.licenseind='N' and eu.vesselname=fr.ship_name and cte.mmsi=fr.mmsi 
+	and to_timestamp(cte.ts)>=to_date(eu.eventstartdate::text,'YYYYMMDD')::timestamp
+	and to_timestamp(cte.ts)<=to_date(eu.eventenddate::text,'YYYYMMDD')::timestamp
+	and ST_Contains(fish.geom,ST_Transform(cte.geom,4326))=true;
+
+Results: FOR LIMIT 50000 rows from ais_data.dynamic_ships, no entries returned, meaning no ships without a registration in fishing areas
+
+20) Which fishing ships are in fishing areas during 7 hours:
+	select distinct sourcemmsi
+	from ais_data.static_ships,  ais_status_codes_types.ship_types
+	where shiptype between shiptype_min and shiptype_max and type_name like 'Fishing%' 
+
+
+INTERSECT select distinct(oneDAy1000.mmsi) from ais_data.oneDay1000, geographic_features.fishing_areas_eu
+where oneDAy1000.lat between minlat 
+	and maxlat and oneDAy1000.lon between fishing_areas_eu.minlong and fishing_areas_eu.maxlong
+
+18)The newest/olderst ships:
+**USING LIMIT**
+**The age of a ship is based on the day of first license
+	YOUNGEST SHIPS:
+	---------------
+	with cte as
+	(	
+		select * from ais_data.dynamic_ships LIMIT 1000000
+	)
+
+	select fr.mmsi,to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp
+	from vesselregister.anfr_vessel_list as fr
+	where fr.mmsi is not null 
+		and to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp=
+			(select max(to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp) from 
+			vesselregister.anfr_vessel_list as fr, cte	
+			where fr.mmsi=cte.mmsi);
+	Result_file:query_18_youngest_ships.csv
+
+	OLDEST SHIPS:
+	------------
+	with cte as
+	(
+		select * from ais_data.dynamic_ships LIMIT 1000000
+	)
+
+	select fr.mmsi,to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp
+	from vesselregister.anfr_vessel_list as fr
+	where fr.mmsi is not null 
+		and to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp=
+			(select min(to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp) from 
+			vesselregister.anfr_vessel_list as fr, cte	
+			where fr.mmsi=cte.mmsi);
+	Result_file: query_18_oldest_ships.csv
+
+19)Ships that are older than 40 years old (based on first registration)
+	with cte as
+	(
+		select * from ais_data.dynamic_ships LIMIT 1000000
+	)
+
+	select count (distinct mmsi)
+	from vesselregister.anfr_vessel_list as fr
+	where  date_part('year',age(now(), to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp))>40
+		and fr.mmsi is not null;
+	Result:385 ships are older than 40 years old.
+
+20)Number of ships that are present in "static_data" but not present in ANFR registrations:
+	with static as
+	(
+		select * from ais_data.static_ships LIMIT 10000
+	)
+
+
+	select count(distinct static.sourcemmsi)
+	from ais_data.static_ships as static
+	where static.sourcemmsi  not in(
+		select fr.mmsi 
+		from static, vesselregister.anfr_vessel_list as fr
+		where fr.mmsi= static.sourcemmsi and static.sourcemmsi is not null)
+	Result:4755
+
+21)Average Number of messages per day
+	select count(*)/183
+	from ais_data.dynamic_ships as cte 
+	where extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')>8
+	and extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')<20
+Results:51729
+
+22)Average Number of messages per day
+	select count(*)
+	from ais_data.dynamic_ships as cte 
+	where (extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')<8 
+		and extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')>=0)
+	or (extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')>20
+		and extract(hour from to_timestamp(cte.ts) AT TIME ZONE 'UTC +1')<=23)
+Results:43277
+
