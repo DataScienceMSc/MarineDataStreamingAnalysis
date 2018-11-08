@@ -200,17 +200,13 @@ Result: 227303430
 			where fr.mmsi=cte.mmsi);
 	Result_file: query_18_oldest_ships.csv
 
-19)Ships that are older than 40 years old (based on first registration)
-	with cte as
-	(
-		select * from ais_data.dynamic_ships LIMIT 1000000
-	)
+19)Ships that are older than 30 years old (based on first registration)
 
-	select count (distinct mmsi)
-	from vesselregister.anfr_vessel_list as fr
-	where  date_part('year',age(now(), to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp))>40
-		and fr.mmsi is not null;
-	Result:385 ships are older than 40 years old.
+SELECT count (distinct fr.mmsi)
+FROM vesselregister.anfr_vessel_list as fr, ais_data.dynamic_ships as cte
+WHERE  date_part('year',age(now(), to_date(fr.date_first_license::text,'DD/MM/YYY')::timestamp))>30
+		and fr.mmsi is not null and cte.mmsi=fr.mmsi;
+Result:139
 
 20)Number of ships that are present in "static_data" but not present in ANFR registrations:
 	with static as
