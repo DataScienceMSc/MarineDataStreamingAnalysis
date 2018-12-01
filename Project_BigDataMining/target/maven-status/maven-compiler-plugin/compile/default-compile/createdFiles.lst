@@ -1,7 +1,0 @@
-team/DynamicShipClass.class
-team/Event.class
-team/test.class
-team/StreamingJob.class
-team/KafkaSource.class
-tests/FileStreaming.class
-team/DynamicShipSchema.class
