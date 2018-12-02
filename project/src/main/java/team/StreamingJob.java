@@ -1,53 +1,40 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package team;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.typeinfo.TypeHint;
-import org.apache.flink.api.java.tuple.Tuple9;
-import org.apache.flink.api.java.utils.ParameterTool;
+import javafx.scene.control.Alert;
+import org.apache.flink.cep.CEP;
+import org.apache.flink.cep.PatternSelectFunction;
+import org.apache.flink.cep.PatternStream;
+import org.apache.flink.cep.pattern.Pattern;
+import org.apache.flink.cep.pattern.conditions.SimpleCondition;
+import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExtractor;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
-import org.apache.flink.util.Collector;
+import org.apache.flink.api.common.serialization.Encoder;
+import org.apache.flink.core.fs.Path;
+import org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink;
 
+import java.io.PrintStream;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 
+ 	//* Skeleton for a Flink Streaming Job.
+  	//* <p>For a tutorial how to write a Flink streaming application, check the
+ 	//* tutorials and examples on the <a href="http://flink.apache.org/docs/stable/">Flink Website</a>.
+ 	//*
+ 	//* <p>To package your application into a JAR file for execution, run
+ 	//* 'mvn clean package' on the command line.
+ 	//*
+ 	//* <p>If you change the name of the main class (with the public static void main(String[] args))
+ 	//* method, change the respective entry in the POM.xml file (simply search for 'mainClass').
 
-/**
- * Skeleton for a Flink Streaming Job.
- *
- * <p>For a tutorial how to write a Flink streaming application, check the
- * tutorials and examples on the <a href="http://flink.apache.org/docs/stable/">Flink Website</a>.
- *
- * <p>To package your application into a JAR file for execution, run
- * 'mvn clean package' on the command line.
- *
- * <p>If you change the name of the main class (with the public static void main(String[] args))
- * method, change the respective entry in the POM.xml file (simply search for 'mainClass').
- */
+
 public class StreamingJob {
 
 	public static void main(String[] args) throws Exception {
@@ -62,27 +49,70 @@ public class StreamingJob {
 
 		// create Kafka's consumer
 		FlinkKafkaConsumer09<String> myConsumer = new FlinkKafkaConsumer09<>("test", new SimpleStringSchema(), properties);
+
 		// create the data stream
-		// create the data stream
-		DataStream<String> stream = env.addSource(myConsumer);
-//		DataStream<Tuple9<Integer, Integer, Integer, Double, Double, Integer, Double, Double, Integer>> parsedata = stream
-//				.map((line) -> {
-//					String[] cells = line.split(",");
-//					// Only keep first and third cells
-//					return new Tuple9<Integer, Integer, Integer, Double, Double, Integer, Double, Double, Integer>(Integer.parseInt(cells[0]), Integer.parseInt(cells[1]), Integer.parseInt(cells[2]), Double.parseDouble(cells[3]),
-//							Double.parseDouble(cells[4]), Integer.parseInt(cells[5]), Double.parseDouble(cells[6]), Double.parseDouble(cells[7]),
-//							Integer.parseInt(cells[8]));
-//				}).returns(new TypeHint<Tuple9<Integer, Integer, Integer, Double, Double, Integer, Double, Double, Integer>>() {
-//					@Override
-//					public TypeInformation<Tuple9<Integer, Integer, Integer, Double, Double, Integer, Double, Double, Integer>> getTypeInfo() {
-//						return super.getTypeInfo();
-//					}
-//				}).keyBy("id");
-		DataStream<DynamicShipClass> ships = stream.map(line -> DynamicShipClass.fromString(line)).keyBy("mmsi");
-		// print() will write the contents of the stream to the TaskManager's standard out stream
-		ships.print();
+		DataStream<DynamicShipClass> ships = env.addSource(myConsumer).map(line -> DynamicShipClass.fromString(line));
+		ships.keyBy("mmsi").assignTimestampsAndWatermarks(new AscendingTimestampExtractor<DynamicShipClass>() {
+
+			@Override
+			public long extractAscendingTimestamp(DynamicShipClass ts) {
+				return ts.getEventTime();
+			}
+		});
+
+
+		Pattern<DynamicShipClass, ?> movingShip =
+				Pattern.<DynamicShipClass>begin("stoppedBefore")
+						.where(new SimpleCondition<DynamicShipClass>() {
+							@Override
+							public boolean filter(DynamicShipClass event) throws Exception {
+								return event.speed == 0.0;
+							}
+						})
+						.next("moving")
+						.where(new SimpleCondition<DynamicShipClass>() {
+							@Override
+							public boolean filter(DynamicShipClass event) throws Exception {
+								return event.speed != 0.0;
+							}
+						});
+						/*.followedBy("stoppedAfter")
+						.where(new SimpleCondition<DynamicShipClass>() {
+							@Override
+							public boolean filter(DynamicShipClass event) throws Exception {
+								return event.speed == 0;
+							}
+						});*/
+
+
+		PatternStream<DynamicShipClass> patternStream = CEP.pattern(ships, movingShip);
+		DataStream<String> outputStream = patternStream.select(new PatternSelectFunction<DynamicShipClass, String>() {
+			@Override
+			public String select(Map<String, List<DynamicShipClass>> pattern) throws Exception {
+				DynamicShipClass first = pattern.get("stoppedBefore").get(0);
+				DynamicShipClass second = pattern.get("moving").get(0);
+				if(first.getmmsi() == second.getmmsi()){
+					return "Shipment : " + first.getSpeed() + second.getSpeed() + " was dropped!";
+				}else{
+					return "ok";
+				}
+
+			}
+		});
+
+		outputStream.map(v -> v.toString()).writeAsText("/Users/thanasiskaridis/Desktop/maritime/MarineDataStreamingAnalysis/project/output.txt", FileSystem.WriteMode.OVERWRITE).setParallelism(1);
+
+
+
+		/**/
+		// print() will write
+		// the contents of the stream to the TaskManager's standard out stream
+		//patternStream.print();
 
 		env.execute();
 
+
 	}
+
+
 }

@@ -6,7 +6,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 
 /**
- * Implements a SerializationSchema and DeserializationSchema for TaxiRide for Kafka data sources and sinks.
+ * Implements a SerializationSchema and DeserializationSchema for DynamicShipClass for Kafka data sources and sinks.
  */
 public class DynamicShipSchema  implements DeserializationSchema<DynamicShipClass>, SerializationSchema<DynamicShipClass> {
 

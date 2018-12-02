@@ -14,10 +14,10 @@ public class DynamicShipClass implements Serializable {
 	//private static transient DateTimeFormatter timeFormatter =
 	//		DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.US).withZoneUTC(); //na valoume to timestamp se wra
 	public DynamicShipClass() {
-		this.ts = new Integer(ts);
+		this.ts = new Long(ts);
 	}
 
-	public DynamicShipClass(int mmsi, int status, int turn, double speed, double course, int heading, double lon, double lat, int ts) {
+	public DynamicShipClass(int mmsi, int status, int turn, double speed, double course, int heading, double lon, double lat, long ts) {
 
 		this.mmsi = mmsi;
 		this.status = status;
@@ -38,7 +38,7 @@ public class DynamicShipClass implements Serializable {
 	public int heading;
 	public double lon;
 	public double lat;
-	public int ts;
+	public long ts;
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -73,7 +73,7 @@ public class DynamicShipClass implements Serializable {
 			ship.heading = tokens[5].length() > 0 ? Integer.parseInt(tokens[5]) : 0;
 			ship.lon = tokens[6].length() > 0 ? Double.parseDouble(tokens[6]) : 0.0f;
 			ship.lat = tokens[7].length() > 0 ? Double.parseDouble(tokens[7]) : 0.0f;
-			ship.ts = tokens[8].length() > 0 ? Integer.parseInt(tokens[8]) : 0;
+			ship.ts = tokens[8].length() > 0 ? Long.parseLong(tokens[8]) : 0;
 
 		} catch (NumberFormatException nfe) {
 			throw new RuntimeException("Invalid record: " + line, nfe);
@@ -81,15 +81,18 @@ public class DynamicShipClass implements Serializable {
 
 		return ship;
 	}
-/*	public long getEventTime() {
-		if (isStart) {
-			return startTime.getMillis();
-		}
-		else {
-			return endTime.getMillis();
-		}
+	public long getEventTime() {
+		return this.ts*1000;
 	}
 
+	public int getmmsi() {
+		return mmsi;
+	}
+
+	public double getSpeed() {
+		return speed;
+	}
+/*
 	public double getEuclideanDistance(double longitude, double latitude) {
 		if (this.isStart) {
 			return GeoUtils.getEuclideanDistance((float) longitude, (float) latitude, this.startLon, this.startLat);
