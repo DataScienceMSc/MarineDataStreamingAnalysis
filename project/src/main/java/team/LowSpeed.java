@@ -1,16 +1,20 @@
 package team;
+
 import org.apache.flink.api.java.io.TextInputFormat;
 import org.apache.flink.cep.CEP;
 import org.apache.flink.cep.PatternFlatSelectFunction;
+import org.apache.flink.cep.nfa.aftermatch.AfterMatchSkipStrategy;
 import org.apache.flink.cep.pattern.Pattern;
-import org.apache.flink.cep.pattern.conditions.SimpleCondition;
 import org.apache.flink.cep.pattern.conditions.IterativeCondition;
+import org.apache.flink.cep.pattern.conditions.SimpleCondition;
 import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.FileProcessingMode;
+import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExtractor;
 import org.apache.flink.util.Collector;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +29,7 @@ import java.util.Map;
 //* method, change the respective entry in the POM.xml file (simply search for 'mainClass').
 
 
-public class SimplePattern {
+public class LowSpeed {
 
     public static void main(String[] args) throws Exception {
 
@@ -33,7 +37,7 @@ public class SimplePattern {
         env.setParallelism(1);
 
         //String path = "folder/";
-        String path = "/home/valia/MarineDataStreamingAnalysis/project/folder/ais_data_very_very_small.csv";
+        String path = "/home/valia/MarineDataStreamingAnalysis/project/folder/ais_data_small.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
@@ -43,30 +47,33 @@ public class SimplePattern {
                 .keyBy(element -> element.getmmsi());
 
 
-        Pattern<DynamicShipClass, DynamicShipClass> movingShip = Pattern.<DynamicShipClass>begin("stoppedBefore")
+        Pattern<DynamicShipClass, DynamicShipClass> movingShip = Pattern.<DynamicShipClass>begin("lowStart", AfterMatchSkipStrategy.skipPastLastEvent())
+
                 .where(new SimpleCondition<DynamicShipClass>() {
                     //private static final long serialVersionUID = 314415972814127035L;
 
                     @Override
                     public boolean filter(DynamicShipClass value) throws Exception {
-                        return value.getSpeed()==0.0;
+                        return value.getSpeed()>=0.5 && value.getSpeed()<5.0;
                     }
                 })
-                .followedBy("middle")
+                .next("middle")
+                .where(new SimpleCondition<DynamicShipClass>() {
+                    //private static final long serialVersionUID = 314415972814127035L;
+
+                    @Override
+                    public boolean filter(DynamicShipClass value) throws Exception {
+                        return value.getSpeed()>=0.5 && value.getSpeed()<5.0;
+                    }
+                })
+                .oneOrMore().greedy().consecutive()
+                .next("lowEnd")
                 .where(new IterativeCondition<DynamicShipClass>() {
                     //private static final long serialVersionUID = 6664468385615273240L;
 
                     @Override
                     public boolean filter(DynamicShipClass value, Context<DynamicShipClass> ctx) throws Exception {
-                        return value.getSpeed() > 0.0;
-                    }
-                }).times(2)
-                .followedBy("end").where(new IterativeCondition<DynamicShipClass>() {
-                    //private static final long serialVersionUID = 6664468385615273240L;
-
-                    @Override
-                    public boolean filter(DynamicShipClass value, Context<DynamicShipClass> ctx) throws Exception {
-                        return value.getSpeed() == 0.0;
+                        return value.getSpeed()<0.5 || value.getSpeed()>5.0;
                     }
                 });
 
@@ -77,7 +84,7 @@ public class SimplePattern {
             @Override
             public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
                 StringBuilder str = new StringBuilder();
-                System.out.println("here");
+                //System.out.println("here");
                 for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
                     for (DynamicShipClass t: entry.getValue()) {
                         str.append(t.getmmsi());
@@ -88,8 +95,8 @@ public class SimplePattern {
                 }
                 collector.collect(str.toString());
             }
-        }).writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
-
+        }).writeAsText("/home/valia/MarineDataStreamingAnalysis/project/folder/output.txt", FileSystem.WriteMode.OVERWRITE);
+        //.writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
         env.execute();
 
 
