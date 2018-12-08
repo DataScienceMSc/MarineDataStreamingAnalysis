@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 
 
-public class DynamicShipClass implements Serializable {
+public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializable {
 
 	//private static transient DateTimeFormatter timeFormatter =
 	//		DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.US).withZoneUTC(); //na valoume to timestamp se wra
@@ -57,7 +57,7 @@ public class DynamicShipClass implements Serializable {
 
 	public static DynamicShipClass fromString(String line) {
 
-		String[] tokens = line.split(",");            //an de douleiuei me to , na dkimasoume \n \t klp
+		String[] tokens = line.split(",");
 		if (tokens.length != 9) {
 			throw new RuntimeException("Invalid record: " + line);
 		}
@@ -81,6 +81,12 @@ public class DynamicShipClass implements Serializable {
 
 		return ship;
 	}
+
+	public int compareTo(DynamicShipClass other) {
+		return Long.compare(this.mmsi, other.mmsi);
+	}
+
+
 	public long getEventTime() {
 		return this.ts*1000;
 	}

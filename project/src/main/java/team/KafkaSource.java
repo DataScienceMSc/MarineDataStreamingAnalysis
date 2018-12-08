@@ -15,7 +15,7 @@ public class KafkaSource {
 
     public static void main(String[] args) throws IOException {
 
-        File file = new File("/home/gelou/Desktop/MSc/AdvancedDataMining/BigDataMining/ais_data_very_very_small.csv");
+        File file = new File("/home/eleni/BigDataMining/ais_data_very_very_small.csv");
 
         BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -34,13 +34,12 @@ public class KafkaSource {
             //  System.out.println(line);
 
             ProducerRecord<String, String> producerRecord = new ProducerRecord<>("test", Integer.toString(key), line);
+            System.out.println(Integer.toString(key) + "..." + producerRecord);
             key++;
-            System.out.println(key);
             producer.send(producerRecord);
             producer.flush();
 
         }
-        producer.close();
         System.out.println("exit");
     }
 }

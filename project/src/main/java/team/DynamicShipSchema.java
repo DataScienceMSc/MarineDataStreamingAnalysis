@@ -8,7 +8,7 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 /**
  * Implements a SerializationSchema and DeserializationSchema for DynamicShipClass for Kafka data sources and sinks.
  */
-public class DynamicShipSchema  implements DeserializationSchema<DynamicShipClass>, SerializationSchema<DynamicShipClass> {
+public class DynamicShipSchema implements DeserializationSchema<DynamicShipClass>, SerializationSchema<DynamicShipClass> {
 
     @Override
     public byte[] serialize(DynamicShipClass element) {
@@ -30,4 +30,6 @@ public class DynamicShipSchema  implements DeserializationSchema<DynamicShipClas
         return TypeExtractor.getForClass(DynamicShipClass.class);
     }
 }
+
+
 

@@ -1,14 +1,14 @@
 package team;
 
-public class moving {
-    private int mmsi;
+public class moving extends DynamicShipClass {
+
 
     public moving(int mmsi) {
         this.mmsi = mmsi;
     }
 
 
-    public double getmmsi() {
+    public int getmmsi() {
         return mmsi;
     }
 
@@ -26,7 +26,7 @@ public class moving {
 
     @Override
     public String toString() {
-        return "speed: { AdId : " + getmmsi() + " }";
+        return "speed: { mmsi : " + getmmsi() + " }";
     }
 
 }
