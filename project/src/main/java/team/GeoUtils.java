@@ -1,9 +1,12 @@
 package team;
 
+import java.io.Serializable;
+
 /**
  * GeoUtils provides utility methods to deal with locations.
  */
-public class GeoUtils {
+public class GeoUtils implements Serializable {
+
 
 	// geo boundaries of the area of Brest
 	public static double MAX_LON = -0.01573666;
@@ -32,7 +35,7 @@ public class GeoUtils {
 	 *
 	 * @return id of mapped grid cell.
 	 */
-	public static int mapToGridCell(float lon, float lat) {
+	public  static int mapToGridCell(double lon, double lat) {
 		int xIndex = (int)Math.floor((Math.abs(MIN_LON) - Math.abs(lon)) / DELTA_LON);
 		int yIndex = (int)Math.floor((MAX_LAT - lat) / DELTA_LAT);
 
@@ -47,7 +50,7 @@ public class GeoUtils {
 	 * @param lng2 longitude of the second ship
 	 * @return distance of the ships
 	 */
-	public float getDistance(double lat1, double lng1, double lat2, double lng2) {
+	public static float getDistance(double lat1, double lng1, double lat2, double lng2) {
 		double dLat = Math.toRadians(lat2-lat1);
 		double dLng = Math.toRadians(lng2-lng1);
 		double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -58,5 +61,4 @@ public class GeoUtils {
 
 		return dist;
 	}
-
 }

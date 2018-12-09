@@ -17,7 +17,7 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 		this.ts = new Long(ts);
 	}
 
-	public DynamicShipClass(int mmsi, int status, int turn, double speed, double course, int heading, double lon, double lat, long ts) {
+	public DynamicShipClass(int mmsi, int status, int turn, double speed, double course, int heading, double lon, double lat, long ts, int gridId) {
 
 		this.mmsi = mmsi;
 		this.status = status;
@@ -28,6 +28,7 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 		this.lon = lon;
 		this.lat = lat;
 		this.ts = ts;
+		this.gridId = gridId;
 	}
 
 	public int mmsi;
@@ -39,6 +40,7 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 	public double lon;
 	public double lat;
 	public long ts;
+	public int gridId;
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -50,9 +52,37 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 		sb.append(heading).append(",");
 		sb.append(lon).append(",");
 		sb.append(lat).append(",");
-		sb.append(ts);
+		sb.append(ts).append(",");
+		sb.append(gridId);
 
 		return sb.toString();
+	}
+
+	public static DynamicShipClass fromString(String line, GeoUtils geo) {
+
+		String[] tokens = line.split(",");
+		if (tokens.length != 9) {
+			throw new RuntimeException("Invalid record: " + line);
+		}
+
+		DynamicShipClass ship = new DynamicShipClass();
+
+		try {
+			ship.mmsi = tokens[0].length() > 0 ? Integer.parseInt(tokens[0]) : 0;
+			ship.status = tokens[1].length() > 0 ? Integer.parseInt(tokens[1]) : 0;
+			ship.turn = tokens[2].length() > 0 ? Integer.parseInt(tokens[2]) : 0;
+			ship.speed = tokens[3].length() > 0 ? Double.parseDouble(tokens[3]) : 0.0f;
+			ship.course = tokens[4].length() > 0 ? Double.parseDouble(tokens[4]) : 0.0f;
+			ship.heading = tokens[5].length() > 0 ? Integer.parseInt(tokens[5]) : 0;
+			ship.lon = tokens[6].length() > 0 ? Double.parseDouble(tokens[6]) : 0.0f;
+			ship.lat = tokens[7].length() > 0 ? Double.parseDouble(tokens[7]) : 0.0f;
+			ship.ts = tokens[8].length() > 0 ? (Long.parseLong(tokens[8])*1000) : 0;
+			ship.gridId = geo.mapToGridCell(ship.lon, ship.lat);
+		} catch (NumberFormatException nfe) {
+			throw new RuntimeException("Invalid record: " + line, nfe);
+		}
+
+		return ship;
 	}
 
 	public static DynamicShipClass fromString(String line) {
@@ -73,8 +103,7 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 			ship.heading = tokens[5].length() > 0 ? Integer.parseInt(tokens[5]) : 0;
 			ship.lon = tokens[6].length() > 0 ? Double.parseDouble(tokens[6]) : 0.0f;
 			ship.lat = tokens[7].length() > 0 ? Double.parseDouble(tokens[7]) : 0.0f;
-			ship.ts = tokens[8].length() > 0 ? Long.parseLong(tokens[8]) : 0;
-
+			ship.ts = tokens[8].length() > 0 ? (Long.parseLong(tokens[8])*1000) : 0;
 		} catch (NumberFormatException nfe) {
 			throw new RuntimeException("Invalid record: " + line, nfe);
 		}
@@ -88,11 +117,15 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 
 
 	public long getEventTime() {
-		return this.ts*1000;
+		return this.ts;
 	}
 
 	public int getmmsi() {
 		return mmsi;
+	}
+
+	public int getGridId() {
+		return gridId;
 	}
 
 	public double getSpeed() {
