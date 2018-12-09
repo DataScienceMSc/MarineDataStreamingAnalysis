@@ -32,7 +32,15 @@ public class SimplePattern_Thanos {
 
 
         GeoUtils geo = new GeoUtils();
+        String lineTest = 1 + "," + 2 + "," + 3 + "," + 4 + "," + 5 + "," + 6 + "," + 1 + "," + 2+ "," + 1;
+        String lineTest2 = 1 + "," + 2 + "," + 3 + "," + 4 + "," + 5 + "," + 6 + "," + 3 + "," + 4+ "," + 2;
 
+        DynamicShipClass test = DynamicShipClass.fromString(lineTest, geo);
+        DynamicShipClass test2 = DynamicShipClass.fromString(lineTest2, geo);
+        Velocity vel = new Velocity(test, test2);
+        int heading = vel.velHeading;
+        double eucl = vel.velValue;
+        System.out.printf("heading: "+ heading + "eucl: "+ eucl);
       /*
     int gridId = geo.mapToGridCell((float) -7.43435, (float) 43.43438);
     int gridId2 = geo.mapToGridCell((float) -7.43334, (float) 43.43334);
@@ -46,69 +54,69 @@ public class SimplePattern_Thanos {
 //        DynamicShipClass test = DynamicShipClass.fromString(lineTest, geo);
 //        int grid_id = test.getGridId();
 //        System.out.printf(String.valueOf(grid_id));
-
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
-
-        String path = "/Users/thanasiskaridis/Desktop/maritime/MarineDataStreamingAnalysis/project/folder";
-        TextInputFormat format = new TextInputFormat(
-                new org.apache.flink.core.fs.Path(path));
-        DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
-
-        DataStream<DynamicShipClass> parsedStream = inputStream
-                .map(line -> DynamicShipClass.fromString(line, geo))
-                .keyBy(element -> element.getmmsi());
-
-
-        Pattern<DynamicShipClass, DynamicShipClass> movingShip = Pattern.<DynamicShipClass>begin("stoppedBefore")
-                .where(new SimpleCondition<DynamicShipClass>() {
-                    //private static final long serialVersionUID = 314415972814127035L;
-
-                    @Override
-                    public boolean filter(DynamicShipClass value) throws Exception {
-                        return value.getSpeed()==0.0;
-                    }
-                })
-                .followedBy("middle")
-                .where(new IterativeCondition<DynamicShipClass>() {
-                    //private static final long serialVersionUID = 6664468385615273240L;
-
-                    @Override
-                    public boolean filter(DynamicShipClass value, Context<DynamicShipClass> ctx) throws Exception {
-                        return value.getSpeed() > 0.0;
-                    }
-                }).times(2)
-                .followedBy("end").where(new IterativeCondition<DynamicShipClass>() {
-                    //private static final long serialVersionUID = 6664468385615273240L;
-
-                    @Override
-                    public boolean filter(DynamicShipClass value, Context<DynamicShipClass> ctx) throws Exception {
-                        return value.getSpeed() == 0.0;
-                    }
-                });
-
-
-        CEP.pattern(parsedStream, movingShip).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
-            //private static final long serialVersionUID = -8972838879934875538L;
-
-            @Override
-            public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
-                StringBuilder str = new StringBuilder();
-                System.out.println("here");
-                for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
-                    for (DynamicShipClass t: entry.getValue()) {
-                        str.append(t.getmmsi());
-                        str.append(",");
-                        str.append(t.getSpeed());
-                        str.append("\n");
-                    }
-                }
-                collector.collect(str.toString());
-            }
-        }).writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
-
-        env.execute();
-
+//
+//        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+//        env.setParallelism(1);
+//
+//        String path = "/Users/thanasiskaridis/Desktop/maritime/MarineDataStreamingAnalysis/project/folder";
+//        TextInputFormat format = new TextInputFormat(
+//                new org.apache.flink.core.fs.Path(path));
+//        DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
+//
+//        DataStream<DynamicShipClass> parsedStream = inputStream
+//                .map(line -> DynamicShipClass.fromString(line, geo))
+//                .keyBy(element -> element.getmmsi());
+//
+//
+//        Pattern<DynamicShipClass, DynamicShipClass> movingShip = Pattern.<DynamicShipClass>begin("stoppedBefore")
+//                .where(new SimpleCondition<DynamicShipClass>() {
+//                    //private static final long serialVersionUID = 314415972814127035L;
+//
+//                    @Override
+//                    public boolean filter(DynamicShipClass value) throws Exception {
+//                        return value.getSpeed()==0.0;
+//                    }
+//                })
+//                .followedBy("middle")
+//                .where(new IterativeCondition<DynamicShipClass>() {
+//                    //private static final long serialVersionUID = 6664468385615273240L;
+//
+//                    @Override
+//                    public boolean filter(DynamicShipClass value, Context<DynamicShipClass> ctx) throws Exception {
+//                        return value.getSpeed() > 0.0;
+//                    }
+//                }).times(2)
+//                .followedBy("end").where(new IterativeCondition<DynamicShipClass>() {
+//                    //private static final long serialVersionUID = 6664468385615273240L;
+//
+//                    @Override
+//                    public boolean filter(DynamicShipClass value, Context<DynamicShipClass> ctx) throws Exception {
+//                        return value.getSpeed() == 0.0;
+//                    }
+//                });
+//
+//
+//        CEP.pattern(parsedStream, movingShip).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
+//            //private static final long serialVersionUID = -8972838879934875538L;
+//
+//            @Override
+//            public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
+//                StringBuilder str = new StringBuilder();
+//                System.out.println("here");
+//                for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
+//                    for (DynamicShipClass t: entry.getValue()) {
+//                        str.append(t.getmmsi());
+//                        str.append(",");
+//                        str.append(t.getSpeed());
+//                        str.append("\n");
+//                    }
+//                }
+//                collector.collect(str.toString());
+//            }
+//        }).writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
+//
+//        env.execute();
+//
 
     }
 
