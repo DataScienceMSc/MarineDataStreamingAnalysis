@@ -3,3 +3,5 @@
 *.class
 .idea*
 *#
+project/target
+project/output
