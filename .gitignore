@@ -1,6 +1,5 @@
 *.iml
 *.csv
 *.class
-*.xml
 .idea*
 *#
