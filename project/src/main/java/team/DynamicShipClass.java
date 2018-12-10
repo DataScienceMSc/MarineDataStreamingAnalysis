@@ -155,6 +155,8 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 	public double getSpeed() {
 		return speed;
 	}
+
+	public int getHeading(){return heading;}
 /*
 	public double getEuclideanDistance(double longitude, double latitude) {
 		if (this.isStart) {
