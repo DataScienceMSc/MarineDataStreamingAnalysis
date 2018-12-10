@@ -15,7 +15,7 @@ public class KafkaSource {
 
     public static void main(String[] args) throws IOException {
 
-        File file = new File("/home/eleni/BigDataMining/ais_data_very_very_small.csv");
+        File file = new File("/home/valia/MarineDataStreamingAnalysis/project/ais_data_small.csv");
 
         BufferedReader br = new BufferedReader(new FileReader(file));
 

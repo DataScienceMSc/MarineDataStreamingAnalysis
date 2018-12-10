@@ -17,7 +17,7 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 		this.ts = new Long(ts);
 	}
 
-	public DynamicShipClass(int mmsi, int status, int turn, double speed, double course, int heading, double lon, double lat, long ts, int gridId) {
+	public DynamicShipClass(int mmsi, int status, int turn, double speed, double course, int heading, double lon, double lat, long ts, int gridId, boolean gapStart, boolean gapEnd) {
 
 		this.mmsi = mmsi;
 		this.status = status;
@@ -29,6 +29,8 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 		this.lat = lat;
 		this.ts = ts;
 		this.gridId = gridId;
+		this.gapStart = gapStart;
+		this.gapEnd = gapEnd;
 	}
 
 	public int mmsi;
@@ -41,6 +43,8 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 	public double lat;
 	public long ts;
 	public int gridId;
+	public boolean gapStart;
+	public boolean gapEnd;
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -126,6 +130,26 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 
 	public int getGridId() {
 		return gridId;
+	}
+
+	public void setgapStart(boolean gapStart) {
+		this.gapStart = gapStart;
+	}
+
+	public void setgapEnd(boolean gapEnd) {
+		this.gapEnd = gapEnd;
+	}
+
+	public boolean getgapStart() {
+		return gapStart;
+	}
+
+	public boolean getgapEnd() {
+		return gapEnd;
+	}
+
+	public double getTs(){
+		return ts;
 	}
 
 	public double getSpeed() {

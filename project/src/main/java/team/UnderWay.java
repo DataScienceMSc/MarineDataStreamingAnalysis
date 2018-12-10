@@ -94,7 +94,7 @@ public class UnderWay {
                 }
                 collector.collect(str.toString());
             }
-        }).writeAsText("/home/valia/MarineDataStreamingAnalysis/project/folder/output.txt", FileSystem.WriteMode.OVERWRITE);
+        }).writeAsText("/home/valia/Desktop/output.txt", FileSystem.WriteMode.OVERWRITE);
         //.writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
         env.execute();
 
