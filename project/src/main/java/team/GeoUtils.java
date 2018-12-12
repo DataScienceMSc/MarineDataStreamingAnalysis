@@ -19,11 +19,11 @@ public class GeoUtils implements Serializable {
 	public static double MAX_LAT = 50.887634;
 
 	// delta step to create artificial grid overlay of Brest
-	public static double DELTA_LON = 0.0014;
-	public static double DELTA_LAT = 0.00125;
+	public static double DELTA_LON = 0.0034;
+	public static double DELTA_LAT = 0.00325;
 
-	public static int NUMBER_OF_GRID_X = (int) Math.floor(Math.abs(MIN_LON) - Math.abs(MAX_LON));
-	public static int NUMBER_OF_GRID_Y = (int) Math.floor(Math.abs(MAX_LAT) - Math.abs(MIN_LAT));
+	public static int NUMBER_OF_GRID_X = (int) (Math.floor(Math.abs(MIN_LON) - Math.abs(MAX_LON)) / DELTA_LON);
+	public static int NUMBER_OF_GRID_Y = (int) (Math.floor(Math.abs(MAX_LAT) - Math.abs(MIN_LAT)) / DELTA_LAT);
 
 	public static double earthRadius = 6371000; //meters
 
@@ -31,7 +31,7 @@ public class GeoUtils implements Serializable {
 	/**
 	 * Maps a location specified by latitude and longitude values to a cell of a
 	 * grid covering the area of Brest
-	 * The grid cells are roughly 100 x 100 m and sequentially number from north-west
+	 * The grid cells are roughly 300 x 300 m and sequentially number from north-west
 	 * to south-east starting by zero.
 	 *
 	 * @param lon longitude of the location to map
@@ -80,6 +80,7 @@ public class GeoUtils implements Serializable {
 				ints[1] = Double.parseDouble(parts[1]);
 				grid = mapToGridCell(ints[0], ints[1]);
 				result.add(grid);
+                System.out.println(" grid: "+ grid +" lat: " + ints[1] + " lon: "+ ints[0] + "\n");
 
 
 		}

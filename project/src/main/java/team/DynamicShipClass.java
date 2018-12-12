@@ -132,6 +132,26 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 		return gridId;
 	}
 
+	public double getLat() {
+		return lat;
+	}
+
+	public double getLon() {
+		return lon;
+	}
+
+	public double getCourse() {
+		return course;
+	}
+
+	public int getTurn() {
+		return turn;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
 	public void setgapStart(boolean gapStart) {
 		this.gapStart = gapStart;
 	}
