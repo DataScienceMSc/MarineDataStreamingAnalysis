@@ -1,6 +1,10 @@
 package team;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * GeoUtils provides utility methods to deal with locations.
@@ -32,18 +36,18 @@ public class GeoUtils implements Serializable {
 	 *
 	 * @param lon longitude of the location to map
 	 * @param lat latitude of the location to map
-	 *
 	 * @return id of mapped grid cell.
 	 */
-	public  static int mapToGridCell(double lon, double lat) {
-		int xIndex = (int)Math.floor((Math.abs(MIN_LON) - Math.abs(lon)) / DELTA_LON);
-		int yIndex = (int)Math.floor((MAX_LAT - lat) / DELTA_LAT);
+	public static int mapToGridCell(double lon, double lat) {
+		int xIndex = (int) Math.floor((Math.abs(MIN_LON) - Math.abs(lon)) / DELTA_LON);
+		int yIndex = (int) Math.floor((MAX_LAT - lat) / DELTA_LAT);
 
 		return xIndex + (yIndex * NUMBER_OF_GRID_X);
 	}
 
 	/**
 	 * Returns the distance between two locations specified as lon/lat pairs.
+	 *
 	 * @param lat1 latitude of the first ship
 	 * @param lng1 longitude of the first ship
 	 * @param lat2 latitude of the second ship
@@ -51,14 +55,34 @@ public class GeoUtils implements Serializable {
 	 * @return distance of the ships
 	 */
 	public static float getDistance(double lat1, double lng1, double lat2, double lng2) {
-		double dLat = Math.toRadians(lat2-lat1);
-		double dLng = Math.toRadians(lng2-lng1);
-		double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+		double dLat = Math.toRadians(lat2 - lat1);
+		double dLng = Math.toRadians(lng2 - lng1);
+		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
 				Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-						Math.sin(dLng/2) * Math.sin(dLng/2);
-		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+						Math.sin(dLng / 2) * Math.sin(dLng / 2);
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 		float dist = (float) (earthRadius * c);
 
 		return dist;
+	}
+
+	public ArrayList<Integer> latlonToGrid(String filePath) throws IOException {
+		ArrayList<Integer> result = new ArrayList<>();
+		int grid;
+		Scanner scan = new Scanner(new File(filePath));
+
+		while (scan.hasNextLine()) {
+			String numLine = scan.nextLine();
+			String[] parts = numLine.split(",");
+			double[] ints = new double[parts.length];
+			//for (int i = 0; i < parts.length; i++) {
+				ints[0] = Double.parseDouble(parts[0]);
+				ints[1] = Double.parseDouble(parts[1]);
+				grid = mapToGridCell(ints[0], ints[1]);
+				result.add(grid);
+
+
+		}
+		return result;
 	}
 }

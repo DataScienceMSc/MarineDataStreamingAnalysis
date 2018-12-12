@@ -13,6 +13,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.FileProcessingMode;
 import org.apache.flink.util.Collector;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ public class SlowMotion {
     public static void main(String[] args) throws Exception {
 
         GeoUtils geo = new GeoUtils();
+        ArrayList<Integer> portsOfBrittany = geo.latlonToGrid("/home/valia/Desktop/latlon.csv");
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
@@ -52,8 +54,8 @@ public class SlowMotion {
                     @Override
                     public boolean filter(DynamicShipClass value) throws Exception {
                         //System.out.println("first event");
-                         if (value.getSpeed()>=0.5 && value.getSpeed()<= 1.0)
-                         {
+                         if (value.getSpeed()>=0.5 && value.getSpeed()<= 1.0 && !(portsOfBrittany.contains(value.getGridId())))
+                        {
                              System.out.println("first match");
                              return true;
                          }
@@ -65,7 +67,7 @@ public class SlowMotion {
 
                     @Override
                     public boolean filter(DynamicShipClass value) throws Exception {
-                        if (value.getSpeed()>=0.5 && value.getSpeed()<= 1.0)
+                        if (value.getSpeed()>=0.5 && value.getSpeed()<= 1.0 && !(portsOfBrittany.contains(value.getGridId())))
                         {
                             System.out.println("second match");
                             return true;
