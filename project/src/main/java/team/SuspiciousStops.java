@@ -11,6 +11,7 @@ import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.FileProcessingMode;
+import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 
 import java.util.ArrayList;
@@ -72,12 +73,12 @@ public class SuspiciousStops {
                             contex="startSuspicious";
                         }
                         for (DynamicShipClass event : ctx.getEventsForPattern(contex)) {
-                            if( ((event.getTs() - 1000) <= value.getTs() && value.getTs() <= event.getTs()) || (value.getTs() <= event.getTs() + 1000  && value.getTs() <=event.getTs()) && event.getSpeed()<0.5 && event.getgapStart() == true)
+                            if( /*((event.getTs() - 1000) <= value.getTs() && value.getTs() <= event.getTs()) || (value.getTs() <= event.getTs() + 1000  && value.getTs() <=event.getTs()) &&*/ event.getSpeed()<0.5 && event.getgapStart() == true)
                                 return true;
                         }
                         return false;
                     }
-                }).timesOrMore(2).consecutive();
+                }).timesOrMore(2).consecutive().within(Time.seconds(600));
 
 
         CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {

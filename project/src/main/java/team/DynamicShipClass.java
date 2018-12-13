@@ -17,7 +17,7 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 		this.ts = new Long(ts);
 	}
 
-	public DynamicShipClass(int mmsi, int status, int turn, double speed, double course, int heading, double lon, double lat, long ts, int gridId, boolean gapStart, boolean gapEnd) {
+	public DynamicShipClass(int mmsi, int status, int turn, double speed, double course, int heading, double lon, double lat, long ts, int gridId, boolean gapStart, boolean gapEnd, boolean lowStart, boolean lowEnd) {
 
 		this.mmsi = mmsi;
 		this.status = status;
@@ -31,6 +31,8 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 		this.gridId = gridId;
 		this.gapStart = gapStart;
 		this.gapEnd = gapEnd;
+		this.lowStart = lowStart;
+		this.lowEnd = lowEnd;
 	}
 
 	public int mmsi;
@@ -45,6 +47,8 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 	public int gridId;
 	public boolean gapStart;
 	public boolean gapEnd;
+	public boolean lowStart;
+	public boolean lowEnd;
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -168,7 +172,7 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 		return gapEnd;
 	}
 
-	public double getTs(){
+	public long getTs(){
 		return ts;
 	}
 
@@ -177,6 +181,18 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 	}
 
 	public int getHeading(){return heading;}
+
+	public boolean getLowStart(){return lowStart;}
+
+	public boolean getLowEnd(){return lowEnd;}
+
+	public void setLowEnd(boolean lowEnd) {
+		this.lowEnd = lowEnd;
+	}
+
+	public void setLowStart(boolean lowStart) {
+		this.lowStart = lowStart;
+	}
 /*
 	public double getEuclideanDistance(double longitude, double latitude) {
 		if (this.isStart) {
