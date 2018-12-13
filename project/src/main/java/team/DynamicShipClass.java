@@ -96,7 +96,7 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 	public static DynamicShipClass fromString(String line) {
 
 		String[] tokens = line.split(",");
-		if (tokens.length != 9) {
+		if (tokens.length != 10) {
 			throw new RuntimeException("Invalid record: " + line);
 		}
 
@@ -112,6 +112,7 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 			ship.lon = tokens[6].length() > 0 ? Double.parseDouble(tokens[6]) : 0.0f;
 			ship.lat = tokens[7].length() > 0 ? Double.parseDouble(tokens[7]) : 0.0f;
 			ship.ts = tokens[8].length() > 0 ? (Long.parseLong(tokens[8])*1000) : 0;
+			ship.gridId = tokens[9].length() > 0 ? (Integer.parseInt(tokens[9])) : 0;
 		} catch (NumberFormatException nfe) {
 			throw new RuntimeException("Invalid record: " + line, nfe);
 		}
