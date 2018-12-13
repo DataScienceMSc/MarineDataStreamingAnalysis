@@ -15,16 +15,6 @@ import org.apache.flink.util.Collector;
 import java.util.List;
 import java.util.Map;
 
-//* Skeleton for a Flink Streaming Job.
-//* <p>For a tutorial how to write a Flink streaming application, check the
-//* tutorials and examples on the <a href="http://flink.apache.org/docs/stable/">Flink Website</a>.
-//*
-//* <p>To package your application into a JAR file for execution, run
-//* 'mvn clean package' on the command line.
-//*
-//* <p>If you change the name of the main class (with the public static void main(String[] args))
-//* method, change the respective entry in the POM.xml file (simply search for 'mainClass').
-
 
 public class Gaps {
 
@@ -35,13 +25,13 @@ public class Gaps {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        String path = "/home/valia/MarineDataStreamingAnalysis/project/folder/ais_data_small.csv";
+        String path = "folder/";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
 
         DataStream<DynamicShipClass> parsedStream = inputStream
-                .map(line -> DynamicShipClass.fromString(line,geo))
+                .map(line -> DynamicShipClass.fromString(line))
                 .keyBy(element -> element.getmmsi());
 
 
@@ -64,17 +54,8 @@ public class Gaps {
                         }
                         for (DynamicShipClass event : ctx.getEventsForPattern(contex)) {
 
-                                if (previous.ts - event.ts >= 10 * 60)
-                                {
-                                    //System.out.println("here");
-                                    previous.setgapStart(true);
-                                    previous.setgapEnd(false);
-                                    event.setgapStart(false);
-                                    event.setgapEnd(true);
-                                    //System.out.println(previous.gapStart + " " + previous.gapEnd + " " + event.gapStart + " " + event.gapEnd);
-                                    //System.out.println(previous.ts + " " +event.ts);
+                                if (previous.ts - event.ts >= 10 * 60*1000)
                                     return true;
-                                }
                                 else
                                     return false;
                         }
@@ -82,30 +63,22 @@ public class Gaps {
                     }
                 });
 
-        CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
-            private static final long serialVersionUID = -8972838879934875538L;
+        DataStream<SimpleEvent> gapEvent = CEP.pattern(parsedStream, increasingSpeed).
+                select((Map<String, List<DynamicShipClass>> pattern) -> {
+                    System.out.println("Match Found!");
+                    long startTime=pattern.get("startGap").get(0).getTs();
+                    long endTime=pattern.get("end").get(0).getTs();
+                    DynamicShipClass temp=pattern.get("startGap").get(0);
+                    System.out.println("StartTime: "+startTime);
+                    System.out.println("EndTime: "+endTime);
+                    System.out.println("Duration: "+(endTime-startTime));
 
-            @Override
-            public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
-                StringBuilder str = new StringBuilder();
-                for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
-                    //System.out.println("Match");
-                    for (DynamicShipClass t: entry.getValue()) {
-                        str.append(t.getmmsi());
-                        str.append(",   ");
-                        str.append(t.getTs());
-                        str.append(",   ");
-                        str.append(t.getgapStart());
-                        str.append(",   ");
-                        str.append(t.getgapEnd());
-                        str.append("\n");
-                    }
-                }
-                collector.collect(str.toString());
-            }
-        }).writeAsText("/home/valia/MarineDataStreamingAnalysis/project/folder/output.txt", FileSystem.WriteMode.OVERWRITE);
+
+                    return new GapEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(),(endTime-startTime));
+                });
 
         env.execute();
+
 
 
     }

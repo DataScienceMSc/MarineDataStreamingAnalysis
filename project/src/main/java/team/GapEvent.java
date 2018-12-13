@@ -3,23 +3,19 @@ package team;
 import java.util.Objects;
 
 public class GapEvent extends SimpleEvent {
-    private enum typeOfGap {gapStar,gapEnd};
+    long duration;
 
-    public GapEvent(int mmsi, long tsStart, long tsEnd, int gridId, typeOfGap gapType) {
+    public GapEvent(int mmsi, long tsStart, long tsEnd, int gridId, long duration) {
         super(mmsi, tsStart, tsEnd, gridId);
-        this.gapType = gapType;
+        this.duration = duration;
     }
 
-    typeOfGap gapType;
-
-
-
-    public typeOfGap getGapType() {
-        return gapType;
+    public long getDuration() {
+        return duration;
     }
 
-    public void setGapType(typeOfGap gapType) {
-        this.gapType = gapType;
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 
     @Override
@@ -28,11 +24,11 @@ public class GapEvent extends SimpleEvent {
         if (!(o instanceof GapEvent)) return false;
         if (!super.equals(o)) return false;
         GapEvent gapEvent = (GapEvent) o;
-        return getGapType() == gapEvent.getGapType();
+        return getDuration() == gapEvent.getDuration();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getGapType());
+        return Objects.hash(super.hashCode(), getDuration());
     }
 }
