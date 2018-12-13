@@ -3,14 +3,14 @@ package team;
 import java.util.Objects;
 
 public class LowSpeedEvent extends SimpleEvent {
-    private int speed;
+    private double speed;
 
-    public LowSpeedEvent(int mmsi, long tsStart, long tsEnd, int gridId, int speed) {
+    public LowSpeedEvent(int mmsi, long tsStart, long tsEnd, int gridId, double speed) {
         super(mmsi, tsStart, tsEnd, gridId);
         this.speed = speed;
     }
 
-    public int getSpeed() {
+    public double getSpeed() {
         return speed;
     }
 
