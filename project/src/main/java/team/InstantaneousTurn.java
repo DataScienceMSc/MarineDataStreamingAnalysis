@@ -35,7 +35,7 @@ public class InstantaneousTurn {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        String path = "folder/";
+        String path = "/home/valia/MarineDataStreamingAnalysis/project/folder/ais_data_small.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
@@ -60,35 +60,27 @@ public class InstantaneousTurn {
 
                         for (DynamicShipClass event : ctx.getEventsForPattern("start")) {
                             //calculating heading difference
-                            return Math.abs(value.getHeading() -event.getHeading())>45;
+                            return Math.abs(value.getHeading() - event.getHeading())>15;
                         }
                         return false;
                     }
                 });
 
-        CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
-            private static final long serialVersionUID = -8972838879934875538L;
-
-            @Override
-            public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
-                StringBuilder str = new StringBuilder();
-                Integer counter=0;
-                for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
-                    System.out.println("Match");
-
-                    for (DynamicShipClass t: entry.getValue()) {
-                        if(counter==0) {
-                            str.append("Instantaneous turn for MMSI:" + t.getmmsi()+"{");
-                        }
-                        str.append(", Heading"+counter.toString()+": "+t.getHeading());
-                        counter = counter + 1;
+        DataStream<SimpleEvent> warnings =  CEP.pattern(parsedStream, increasingSpeed)
+                .select((Map<String, List<DynamicShipClass>> pattern) -> {
+                    long startTime=0;
+                    long endTime= 0;
+                    int degrees = 0;
+                    System.out.println("Match Found!");
+                    for (Map.Entry<String, List<DynamicShipClass>> entry: pattern.entrySet()) {
+                        startTime= entry.getValue().get(0).getTs();
+                        endTime= entry.getValue().get(entry.getValue().size()-1).getTs();
+                        degrees = Math.abs(entry.getValue().get(0).getHeading() - entry.getValue().get(entry.getValue().size()-1).getHeading()) ;
                     }
+                    DynamicShipClass temp=pattern.get("start").get(0);
+                    return new InstantaneousTurnEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(), degrees);
+                });
 
-                }str.append("}\n");
-                collector.collect(str.toString());
-            }
-        }).writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
-        ;
         env.execute();
 
 
