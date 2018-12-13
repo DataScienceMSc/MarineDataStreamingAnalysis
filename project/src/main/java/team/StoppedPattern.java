@@ -2,14 +2,17 @@ package team;
 
 import org.apache.flink.api.java.io.TextInputFormat;
 import org.apache.flink.cep.CEP;
+import org.apache.flink.cep.PatternFlatSelectFunction;
 import org.apache.flink.cep.nfa.aftermatch.AfterMatchSkipStrategy;
 import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.cep.pattern.conditions.IterativeCondition;
 import org.apache.flink.cep.pattern.conditions.SimpleCondition;
+import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.datastream.ConnectedStreams;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.FileProcessingMode;
+import org.apache.flink.util.Collector;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +25,7 @@ public class StoppedPattern {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        String path = "/home/valia/MarineDataStreamingAnalysis/project/folder/ais_data_small.csv";
+        String path = "folder/";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
 
@@ -104,13 +107,49 @@ public class StoppedPattern {
                     return new InstantaneousTurnEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(), degrees);
                 });
 
-       // turn.print();
-        ConnectedStreams<SimpleEvent, SimpleEvent> connectedStreams = stopped.connect(turn);
-        //System.out.println(connectedStreams.toString());
-       // DataStream<SimpleEvent> Final = stopped.connect(turn);
-        //Final.connect(turn);
-        //Final.print();
+        DataStream<SimpleEvent> connectedStreams = stopped.union(turn);
+        stopped.print();
+        turn.print();
+        connectedStreams.print();
+
+        Pattern<SimpleEvent, ?> complex = Pattern.<SimpleEvent>begin("start")
+                .subtype(StoppedEvent.class)
+                .where(new SimpleCondition<StoppedEvent>() {
+
+                    @Override
+                    public boolean filter(StoppedEvent value) throws Exception {
+                        return true;
+                    }
+                })
+                .followedBy("end")
+                .subtype(InstantaneousTurnEvent.class)
+                .where(new SimpleCondition<InstantaneousTurnEvent>() {
+
+                    @Override
+                    public boolean filter(InstantaneousTurnEvent value) throws Exception {
+                        return true;
+                    }
+                });
+
+
+        CEP.pattern(connectedStreams, complex).flatSelect(new PatternFlatSelectFunction<SimpleEvent, String>() {
+
+            @Override
+            public void flatSelect(Map<String, List<SimpleEvent>> map, Collector<String> collector) throws Exception {
+                StringBuilder str = new StringBuilder();
+                for (Map.Entry<String, List<SimpleEvent>> entry: map.entrySet()) {
+                    for (SimpleEvent t: entry.getValue()) {
+                       // StoppedEvent mpiri = (StoppedEvent) t;
+                      //  InstantaneousTurn mpiri2 = (InstantaneousTurn) t;
+                        str.append(t.getMmsi());
+                    }
+                }
+                collector.collect(str.toString());
+            }
+        }).writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
+
         env.execute();
+
     }
 
 
