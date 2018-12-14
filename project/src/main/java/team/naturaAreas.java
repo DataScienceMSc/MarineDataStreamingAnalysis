@@ -33,10 +33,10 @@ public class naturaAreas {
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
 
         DataStream<DynamicShipClass> parsedStream = inputStream
-                .map(line -> DynamicShipClass.fromString(line, geo))
+                .map(line -> DynamicShipClass.fromString(line))
                 .keyBy(element -> element.getmmsi());
 
-        Pattern<DynamicShipClass, DynamicShipClass> increasingSpeed = Pattern.<DynamicShipClass>begin("Natura", AfterMatchSkipStrategy.skipPastLastEvent())
+        Pattern<DynamicShipClass, DynamicShipClass> naturaAreas = Pattern.<DynamicShipClass>begin("Natura", AfterMatchSkipStrategy.skipPastLastEvent())
                 .where(new SimpleCondition<DynamicShipClass>() {
 
                     @Override
@@ -46,25 +46,25 @@ public class naturaAreas {
                         else
                             return false;
                     }
+                }).oneOrMore();
+
+
+
+        DataStream<SimpleEvent> naturaEvent = CEP.pattern(parsedStream, naturaAreas).
+                select((Map<String, List<DynamicShipClass>> pattern) -> {
+                    System.out.println("Match Found!");
+                    long startTime=pattern.get("Natura").get(0).getTs();
+                    long endTime=pattern.get("Natura").get(0).getTs();
+                    double lat = pattern.get("Natura").get(0).getLat();
+                    double lon = pattern.get("Natura").get(0).getLon();
+                    DynamicShipClass temp=pattern.get("Natura").get(0);
+                    System.out.println("StartTime: "+startTime);
+                    System.out.println("EndTime: "+endTime);
+                    System.out.println("Duration: "+(endTime-startTime));
+
+
+                    return new NaturaEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(),lat, lon);
                 });
-
-
-        CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
-            private static final long serialVersionUID = -8972838879934875538L;
-
-            @Override
-            public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
-                StringBuilder str = new StringBuilder();
-                for (Map.Entry<String, List<DynamicShipClass>> entry : map.entrySet()) {
-                    System.out.println("Match");
-                    for (DynamicShipClass t : entry.getValue()) {
-                        str.append(t.getmmsi());
-
-                    }
-                }
-                collector.collect(str.toString());
-            }
-        }).writeAsText("/home/valia/MarineDataStreamingAnalysis/project/folder/output.txt", FileSystem.WriteMode.OVERWRITE);
 
         env.execute();
 
