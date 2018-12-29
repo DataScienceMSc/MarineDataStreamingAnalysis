@@ -79,16 +79,16 @@ public class Acceleration {
 
                     for (DynamicShipClass t: entry.getValue()) {
                         if(counter==0) {
-                            str.append("Acceleration for MMSI:" + t.getmmsi()+"{");
+                            str.append(t.getmmsi());
                             counter = counter + 1;
                         }
-                        str.append(", Speed"+counter.toString()+": "+t.getSpeed());
-                        str.append(", lat" + t.getLat());
-                        str.append(", lon" + t.getLon());
-                        str.append(", timestamp " + t.getTs());
+                        //str.append(", Speed"+counter.toString()+": "+t.getSpeed());
+                        str.append("," + t.getLat());
+                        str.append("," + t.getLon());
+                        //str.append(", timestamp " + t.getTs());
                     }
 
-                }str.append("}\n");
+                }str.append("\n");
                 collector.collect(str.toString());
             }
             }).writeAsText("/Users/thanasiskaridis/Desktop/acceleration.txt", FileSystem.WriteMode.OVERWRITE);
