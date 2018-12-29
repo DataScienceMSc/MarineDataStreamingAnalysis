@@ -19,8 +19,8 @@ public class GeoUtils implements Serializable {
 	public static double MAX_LAT = 50.887634;
 
 	// delta step to create artificial grid overlay of Brest
-	public static double DELTA_LON = 0.0034;
-	public static double DELTA_LAT = 0.00325;
+	public static double DELTA_LON = 0.0054;
+	public static double DELTA_LAT = 0.00525;
 
 	public static int NUMBER_OF_GRID_X = (int) (Math.floor(Math.abs(MIN_LON) - Math.abs(MAX_LON)) / DELTA_LON);
 	public static int NUMBER_OF_GRID_Y = (int) (Math.floor(Math.abs(MAX_LAT) - Math.abs(MIN_LAT)) / DELTA_LAT);

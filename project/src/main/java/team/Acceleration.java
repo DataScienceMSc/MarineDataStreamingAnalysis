@@ -35,13 +35,13 @@ public class Acceleration {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        String path = "folder/";
+        String path = "/Users/thanasiskaridis/Desktop/FarFromPorts.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
 
         DataStream<DynamicShipClass> parsedStream = inputStream
-                .map(line -> DynamicShipClass.fromString(line,geo))
+                .map(line -> DynamicShipClass.fromString(line))
                 .keyBy(element -> element.getmmsi());
 
 
@@ -50,7 +50,7 @@ public class Acceleration {
 
                     @Override
                     public boolean filter(DynamicShipClass value) throws Exception {
-                        return value.getSpeed()>0.0; //not including noise
+                        return value.getSpeed()>0.1; //not including noise
                     }
                 })
                .next("end").where(new IterativeCondition<DynamicShipClass>() {
@@ -60,14 +60,15 @@ public class Acceleration {
 
                         for (DynamicShipClass event : ctx.getEventsForPattern("start")) {
                             //calculating percentage increase
-                            return ((value.getSpeed()-event.getSpeed())/event.getSpeed()*100)>=25;
+                            Double acc = ((value.getSpeed() - event.getSpeed())/(value.getTs()-event.getTs()));
+                            if (acc >= 0.25)
+                                return true;
                         }
                         return false;
                     }
                 });
 
         CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
-            private static final long serialVersionUID = -8972838879934875538L;
 
             @Override
             public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
@@ -82,15 +83,18 @@ public class Acceleration {
                             counter = counter + 1;
                         }
                         str.append(", Speed"+counter.toString()+": "+t.getSpeed());
+                        str.append(", lat" + t.getLat());
+                        str.append(", lon" + t.getLon());
+                        str.append(", timestamp " + t.getTs());
                     }
 
                 }str.append("}\n");
                 collector.collect(str.toString());
             }
-        }).writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
-        ;
-        env.execute();
+            }).writeAsText("/Users/thanasiskaridis/Desktop/acceleration.txt", FileSystem.WriteMode.OVERWRITE);
 
+        env.execute();
+        System.out.println("end of matches");
 
     }
 

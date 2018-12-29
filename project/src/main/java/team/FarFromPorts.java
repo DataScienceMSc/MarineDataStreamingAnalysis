@@ -31,7 +31,7 @@ public class FarFromPorts {
         properties.setProperty("group.id", "test");
 
         // create Kafka's consumer
-        FlinkKafkaConsumer09<String> myConsumer = new FlinkKafkaConsumer09<>("test", new SimpleStringSchema(), properties);
+        FlinkKafkaConsumer09<String> myConsumer = new FlinkKafkaConsumer09<>("FinalOpenSeaEntries2", new SimpleStringSchema(), properties);
 
         // create the data stream
         DataStream<String> inputStream = env.addSource(myConsumer);
@@ -55,7 +55,7 @@ public class FarFromPorts {
                     }
                 }).keyBy(DynamicShipClass::getmmsi);
 
-        Pattern<DynamicShipClass, DynamicShipClass> increasingSpeed = Pattern.<DynamicShipClass>begin("startSlowMotion", AfterMatchSkipStrategy.skipPastLastEvent())
+        Pattern<DynamicShipClass, DynamicShipClass> increasingSpeed = Pattern.<DynamicShipClass>begin("openSea", AfterMatchSkipStrategy.skipPastLastEvent())
                 .where(new SimpleCondition<DynamicShipClass>() {
 
                     @Override
@@ -73,7 +73,6 @@ public class FarFromPorts {
                 });
 
         CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
-            private static final long serialVersionUID = -8972838879934875538L;
 
             @Override
             public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {

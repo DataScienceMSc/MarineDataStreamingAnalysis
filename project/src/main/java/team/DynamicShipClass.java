@@ -84,7 +84,7 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 			ship.heading = tokens[5].length() > 0 ? Integer.parseInt(tokens[5]) : 0;
 			ship.lon = tokens[6].length() > 0 ? Double.parseDouble(tokens[6]) : 0.0f;
 			ship.lat = tokens[7].length() > 0 ? Double.parseDouble(tokens[7]) : 0.0f;
-			ship.ts = tokens[8].length() > 0 ? (Long.parseLong(tokens[8])*1000) : 0;
+			ship.ts = tokens[8].length() > 0 ? (Long.parseLong(tokens[8])) : 0;
 			ship.gridId = geo.mapToGridCell(ship.lon, ship.lat);
 		} catch (NumberFormatException nfe) {
 			throw new RuntimeException("Invalid record: " + line, nfe);
@@ -111,7 +111,7 @@ public class DynamicShipClass implements Comparable<DynamicShipClass>, Serializa
 			ship.heading = tokens[5].length() > 0 ? Integer.parseInt(tokens[5]) : 0;
 			ship.lon = tokens[6].length() > 0 ? Double.parseDouble(tokens[6]) : 0.0f;
 			ship.lat = tokens[7].length() > 0 ? Double.parseDouble(tokens[7]) : 0.0f;
-			ship.ts = tokens[8].length() > 0 ? (Long.parseLong(tokens[8])*1000) : 0;
+			ship.ts = tokens[8].length() > 0 ? (Long.parseLong(tokens[8])) : 0;
 			ship.gridId = tokens[9].length() > 0 ? (Integer.parseInt(tokens[9])) : 0;
 		} catch (NumberFormatException nfe) {
 			throw new RuntimeException("Invalid record: " + line, nfe);
