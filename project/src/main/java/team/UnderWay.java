@@ -35,7 +35,7 @@ public class UnderWay {
         env.setParallelism(1);
 
         //String path = "folder/";
-        String path = "/home/valia/MarineDataStreamingAnalysis/project/folder/ais_data_small.csv";
+        String path = "/Users/thanasiskaridis/Desktop/FarFromPorts.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
@@ -57,7 +57,6 @@ public class UnderWay {
                 })
                 .next("middle")
                 .where(new SimpleCondition<DynamicShipClass>() {
-                    //private static final long serialVersionUID = 314415972814127035L;
 
                     @Override
                     public boolean filter(DynamicShipClass value) throws Exception {
@@ -67,7 +66,6 @@ public class UnderWay {
                 .oneOrMore().greedy().consecutive()
                 .next("lowEnd")
                 .where(new IterativeCondition<DynamicShipClass>() {
-                    //private static final long serialVersionUID = 6664468385615273240L;
 
                     @Override
                     public boolean filter(DynamicShipClass value, Context<DynamicShipClass> ctx) throws Exception {
@@ -78,23 +76,30 @@ public class UnderWay {
 
 
         CEP.pattern(parsedStream, movingShip).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
-            private static final long serialVersionUID = -8972838879934875538L;
 
             @Override
             public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
                 StringBuilder str = new StringBuilder();
                 //System.out.println("here");
+                System.out.println("Match");
                 for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
                     for (DynamicShipClass t: entry.getValue()) {
                         str.append(t.getmmsi());
                         str.append(",");
                         str.append(t.getSpeed());
+                        str.append(",");
+                        str.append(t.getLat());
+                        str.append(",");
+                        str.append(t.getLon());
+                        str.append(",");
+                        str.append(t.getTs());
+
                         str.append("\n");
                     }
                 }
                 collector.collect(str.toString());
             }
-        }).writeAsText("/home/valia/Desktop/output.txt", FileSystem.WriteMode.OVERWRITE);
+        }).writeAsText("/Users/thanasiskaridis/Desktop/underWay.txt", FileSystem.WriteMode.OVERWRITE);
         //.writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
         env.execute();
 

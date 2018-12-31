@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
-
 public class naturaAreas {
 
     public static void main(String[] args) throws Exception {

@@ -25,18 +25,14 @@ public class StoppedPattern {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        String path = "/home/valia/Desktop/FarFromPorts.csv";
+        String path = "/Users/thanasiskaridis/Desktop/FarFromPorts.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
 
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
-
-
         DataStream<DynamicShipClass> parsedStream = inputStream
                 .map(line -> DynamicShipClass.fromString(line))
                 .keyBy(element -> element.getmmsi());
-
-
 
         Pattern<DynamicShipClass, ?> stoppedShip = Pattern.<DynamicShipClass>begin("start"
                 , AfterMatchSkipStrategy.skipPastLastEvent())
@@ -107,10 +103,8 @@ public class StoppedPattern {
                     return new InstantaneousTurnEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(), degrees);
                 });
 
-        DataStream<SimpleEvent> connectedStreams = stopped.union(turn);
-       // stopped.print();
-        //turn.print();
-        //connectedStreams.print();
+        DataStream<SimpleEvent> connectedStreams = stopped.union(turn)
+             .keyBy(element -> element.getMmsi());
 
         Pattern<SimpleEvent, ?> complex = Pattern.<SimpleEvent>begin("start")
                 .subtype(StoppedEvent.class)
@@ -118,6 +112,7 @@ public class StoppedPattern {
 
                     @Override
                     public boolean filter(StoppedEvent value) throws Exception {
+                        System.out.println("Found3");
                         return true;
                     }
                 })
@@ -127,6 +122,7 @@ public class StoppedPattern {
 
                     @Override
                     public boolean filter(InstantaneousTurnEvent value) throws Exception {
+                        System.out.println("Found4");
                         return true;
                     }
                 });
@@ -146,11 +142,12 @@ public class StoppedPattern {
                         str.append(", " + t.getTsStart());
                         str.append(", " + t.getTsEnd());
                         str.append(", " + t.getGridId());
+                        str.append("\n");
                     }
                 }
                 collector.collect(str.toString());
             }
-        }).writeAsText("/home/valia/Desktop/Stopped.csv", FileSystem.WriteMode.OVERWRITE);
+        }).writeAsText("/Users/thanasiskaridis/Desktop/Stopped.csv", FileSystem.WriteMode.OVERWRITE);
 
         env.execute();
 
