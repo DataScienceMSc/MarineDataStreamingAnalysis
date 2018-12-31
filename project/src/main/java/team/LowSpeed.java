@@ -25,7 +25,7 @@ public class LowSpeed {
         env.setParallelism(1);
 
         //String path = "folder/";
-        String path = "/Users/thanasiskaridis/Desktop/weqweqwFarFromPorts.csv";
+        String path = "/home/valia/Desktop/FarFromPorts.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
@@ -123,7 +123,7 @@ public class LowSpeed {
 
                     @Override
                     public boolean filter(DynamicShipClass value) throws Exception {
-                        if (naturaArea.contains(value.getGridId()) || naturaArea.contains(value.getGridId()-1) || naturaArea.contains(value.getGridId() + 1))
+                        if (naturaArea.contains(value.getGridId()))
                             return true;
                         else
                             return false;
@@ -285,7 +285,7 @@ public class LowSpeed {
                 }
                 collector.collect(str.toString());
             }
-        }).writeAsText("output.txt");
+        }).writeAsText("lowSpeed.txt");
 
 
 

@@ -8,12 +8,14 @@ import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.cep.pattern.conditions.IterativeCondition;
 import org.apache.flink.cep.pattern.conditions.SimpleCondition;
 import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.FileProcessingMode;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,15 +39,16 @@ public class SuspiciousStops {
 
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        //env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
         env.setParallelism(1);
 
-        String path = "/home/valia/MarineDataStreamingAnalysis/project/folder/ais_data_small.csv";
+        String path = "/home/valia/Desktop/FarFromPorts.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
 
         DataStream<DynamicShipClass> parsedStream = inputStream
-                .map(line -> DynamicShipClass.fromString(line,geo))
+                .map(line -> DynamicShipClass.fromString(line))
                 .keyBy(element -> element.getGridId());
 
 
@@ -73,16 +76,15 @@ public class SuspiciousStops {
                             contex="startSuspicious";
                         }
                         for (DynamicShipClass event : ctx.getEventsForPattern(contex)) {
-                            if( /*((event.getTs() - 1000) <= value.getTs() && value.getTs() <= event.getTs()) || (value.getTs() <= event.getTs() + 1000  && value.getTs() <=event.getTs()) &&*/ event.getSpeed()<0.5 && event.getgapStart() == true)
+                            if( ((event.getTs() - 600) <= value.getTs() && value.getTs() <= event.getTs()) || (value.getTs() <= event.getTs() + 600  && value.getTs() <=event.getTs()) && event.getSpeed()<0.5 && event.getgapStart() == true)
                                 return true;
                         }
                         return false;
                     }
-                }).timesOrMore(2).consecutive().within(Time.seconds(600));
+                }).timesOrMore(2).consecutive();//.within(Time.seconds(600));
 
 
         CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
-            private static final long serialVersionUID = -8972838879934875538L;
 
             @Override
             public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
@@ -94,13 +96,13 @@ public class SuspiciousStops {
                         str.append(",   ");
                         str.append(t.getSpeed());
                         str.append(",   ");
-                        str.append(t.getEventTime());
+                        str.append(t.getTs());
                         str.append("\n");
                     }
                 }
                 collector.collect(str.toString());
             }
-        }).writeAsText("/home/valia/MarineDataStreamingAnalysis/project/folder/output.tx", FileSystem.WriteMode.OVERWRITE);
+        }).writeAsText("/home/valia/Desktop/suspiciousStops.tx", FileSystem.WriteMode.OVERWRITE);
 
         env.execute();
 

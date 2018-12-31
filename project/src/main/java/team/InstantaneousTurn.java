@@ -35,13 +35,13 @@ public class InstantaneousTurn {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        String path = "/home/valia/MarineDataStreamingAnalysis/project/folder/ais_data_small.csv";
+        String path = "/home/valia/Desktop/FarFromPorts.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
 
         DataStream<DynamicShipClass> parsedStream = inputStream
-                .map(line -> DynamicShipClass.fromString(line,geo))
+                .map(line -> DynamicShipClass.fromString(line))
                 .keyBy(element -> element.getmmsi());
 
 
@@ -50,7 +50,7 @@ public class InstantaneousTurn {
 
                     @Override
                     public boolean filter(DynamicShipClass value) throws Exception {
-                        return value.getSpeed()>0.0; //not including noise
+                        return value.getSpeed()>0.1; //not including noise
                     }
                 })
                .next("end").where(new IterativeCondition<DynamicShipClass>() {
@@ -66,20 +66,48 @@ public class InstantaneousTurn {
                     }
                 });
 
-        DataStream<SimpleEvent> warnings =  CEP.pattern(parsedStream, increasingSpeed)
-                .select((Map<String, List<DynamicShipClass>> pattern) -> {
-                    long startTime=0;
-                    long endTime= 0;
-                    int degrees = 0;
-                    System.out.println("Match Found!");
-                    for (Map.Entry<String, List<DynamicShipClass>> entry: pattern.entrySet()) {
-                        startTime= entry.getValue().get(0).getTs();
-                        endTime= entry.getValue().get(entry.getValue().size()-1).getTs();
-                        degrees = Math.abs(entry.getValue().get(0).getHeading() - entry.getValue().get(entry.getValue().size()-1).getHeading()) ;
+        CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
+
+
+            @Override
+        public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
+            StringBuilder str = new StringBuilder();
+            Integer counter=0;
+            for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
+                System.out.println("Match");
+
+                for (DynamicShipClass t: entry.getValue()) {
+                    if (counter == 0) {
+                        str.append(t.getmmsi());
+                        counter = counter + 1;
                     }
-                    DynamicShipClass temp=pattern.get("start").get(0);
-                    return new InstantaneousTurnEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(), degrees);
-                });
+                    //str.append(", Speed"+counter.toString()+": "+t.getSpeed());
+                    str.append("," + t.getLat());
+                    str.append("," + t.getLon());
+                    str.append(", " + t.getHeading());
+                    //str.append(", timestamp " + t.getTs());
+                }
+            }
+            str.append("\n");
+            collector.collect(str.toString());
+        }
+    }).writeAsText("/home/valia/Desktop/InstaneousTurn.txt", FileSystem.WriteMode.OVERWRITE);
+
+
+//        DataStream<SimpleEvent> warnings =  CEP.pattern(parsedStream, increasingSpeed)
+//                .select((Map<String, List<DynamicShipClass>> pattern) -> {
+//                    long startTime=0;
+//                    long endTime= 0;
+//                    int degrees = 0;
+//                    System.out.println("Match Found!");
+//                    for (Map.Entry<String, List<DynamicShipClass>> entry: pattern.entrySet()) {
+//                        startTime= entry.getValue().get(0).getTs();
+//                        endTime= entry.getValue().get(entry.getValue().size()-1).getTs();
+//                        degrees = Math.abs(entry.getValue().get(0).getHeading() - entry.getValue().get(entry.getValue().size()-1).getHeading()) ;
+//                    }
+//                    DynamicShipClass temp=pattern.get("start").get(0);
+//                    return new InstantaneousTurnEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(), degrees);
+//                });
 
         env.execute();
 

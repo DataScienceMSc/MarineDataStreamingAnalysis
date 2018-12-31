@@ -25,7 +25,7 @@ public class StoppedPattern {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        String path = "folder/";
+        String path = "/home/valia/Desktop/FarFromPorts.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
 
@@ -62,7 +62,7 @@ public class StoppedPattern {
                 select((Map<String, List<DynamicShipClass>> pattern) -> {
                     long startTime=0;
                     long endTime= 0;
-                    System.out.println("Match Found!");
+                    System.out.println("Match Found1!");
                     for (Map.Entry<String, List<DynamicShipClass>> entry: pattern.entrySet()) {
                         startTime= entry.getValue().get(0).getTs();
                         endTime= entry.getValue().get(entry.getValue().size()-1).getTs();
@@ -97,7 +97,7 @@ public class StoppedPattern {
                     long startTime=0;
                     long endTime= 0;
                     int degrees = 0;
-                    System.out.println("Match Found!");
+                    System.out.println("Match Found2!");
                     for (Map.Entry<String, List<DynamicShipClass>> entry: pattern.entrySet()) {
                         startTime= entry.getValue().get(0).getTs();
                         endTime= entry.getValue().get(entry.getValue().size()-1).getTs();
@@ -108,9 +108,9 @@ public class StoppedPattern {
                 });
 
         DataStream<SimpleEvent> connectedStreams = stopped.union(turn);
-        stopped.print();
-        turn.print();
-        connectedStreams.print();
+       // stopped.print();
+        //turn.print();
+        //connectedStreams.print();
 
         Pattern<SimpleEvent, ?> complex = Pattern.<SimpleEvent>begin("start")
                 .subtype(StoppedEvent.class)
@@ -141,12 +141,16 @@ public class StoppedPattern {
                     for (SimpleEvent t: entry.getValue()) {
                        // StoppedEvent mpiri = (StoppedEvent) t;
                       //  InstantaneousTurn mpiri2 = (InstantaneousTurn) t;
+                        System.out.println("Writing");
                         str.append(t.getMmsi());
+                        str.append(", " + t.getTsStart());
+                        str.append(", " + t.getTsEnd());
+                        str.append(", " + t.getGridId());
                     }
                 }
                 collector.collect(str.toString());
             }
-        }).writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
+        }).writeAsText("/home/valia/Desktop/Stopped.csv", FileSystem.WriteMode.OVERWRITE);
 
         env.execute();
 

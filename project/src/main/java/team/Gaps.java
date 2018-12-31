@@ -24,7 +24,7 @@ public class Gaps {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        String path = "/Users/thanasiskaridis/Desktop/FarFromPorts.csv";
+        String path = "/home/valia/Desktop/FarFromPorts.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
@@ -53,7 +53,7 @@ public class Gaps {
                         }
                         for (DynamicShipClass event : ctx.getEventsForPattern(contex)) {
 
-                                if (previous.ts - event.ts >= 10 * 60)
+                                if (previous.ts - event.ts >= 10 * 60 * 2)
                                     return true;
                                 else
                                     return false;
@@ -87,10 +87,10 @@ public class Gaps {
             str.append(", " + startTime);
             str.append(", " + endTime);
             str.append(", " + (endTime - startTime));
-            str.append("\n");
+            //str.append("\n");
             collector.collect(str.toString());
         }
-    }).writeAsText("/Users/thanasiskaridis/Desktop/gaps.txt", FileSystem.WriteMode.OVERWRITE);
+    }).writeAsText("/home/valia/Desktop/gaps.txt", FileSystem.WriteMode.OVERWRITE);
 
         env.execute();
         System.out.println("end of matches");
