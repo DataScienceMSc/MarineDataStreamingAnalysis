@@ -24,9 +24,9 @@ public class naturaAreas {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         GeoUtils geo = new GeoUtils();
-        ArrayList<Integer> naturaArea = geo.latlonToGrid("/home/valia/Desktop/NaturaCentroidsFrance.csv");
+        ArrayList<Integer> naturaArea = geo.latlonToGrid("inputFiles/NaturaCentroidsFrance.csv");
 
-        String path = "/home/valia/Desktop/FarFromPorts.csv";
+        String path = "inputFiles/FarFromPorts_small.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
@@ -40,8 +40,10 @@ public class naturaAreas {
 
                     @Override
                     public boolean filter(DynamicShipClass value) throws Exception {
-                        if (naturaArea.contains(value.getGridId()))
+                        if (naturaArea.contains(value.getGridId())) {
+                            System.out.println("Grid Id:" + value.getGridId());
                             return true;
+                        }
                         else
                             return false;
                     }
@@ -72,24 +74,8 @@ public class naturaAreas {
                 //str.append("\n");
                 collector.collect(str.toString());
             }
-        }).writeAsText("/home/valia/Desktop/naturaAreas1.txt", FileSystem.WriteMode.OVERWRITE);
+        }).writeAsText("./results/naturaAreas.txt", FileSystem.WriteMode.OVERWRITE);
 
-//        DataStream<SimpleEvent> naturaEvent = CEP.pattern(parsedStream, naturaAreas).
-//                select((Map<String, List<DynamicShipClass>> pattern) -> {
-//                    System.out.println("Match Found!");
-//                    long startTime=pattern.get("Natura").get(0).getTs();
-//                    long endTime=pattern.get("Natura").get(0).getTs();
-//                    double lat = pattern.get("Natura").get(0).getLat();
-//                    double lon = pattern.get("Natura").get(0).getLon();
-//                    DynamicShipClass temp=pattern.get("Natura").get(0);
-//                    System.out.println("StartTime: "+startTime);
-//                    System.out.println("EndTime: "+endTime);
-//                    System.out.println("Duration: "+(endTime-startTime));
-//
-//
-//                    return new NaturaEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(),lat, lon);
-//                });
-//
         env.execute();
 
     }

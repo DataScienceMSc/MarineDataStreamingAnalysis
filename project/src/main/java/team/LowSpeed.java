@@ -71,7 +71,7 @@ public class LowSpeed {
                     return new LowSpeedEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(),speed);
                 });
 
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         Pattern<DynamicShipClass, DynamicShipClass> gapPattern = Pattern.<DynamicShipClass>begin("startGap")
                 .where(new SimpleCondition<DynamicShipClass>() {
 
@@ -113,7 +113,7 @@ public class LowSpeed {
 
                     return new GapEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(),(endTime-startTime));
                 });
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         GeoUtils geo = new GeoUtils();
         ArrayList<Integer> naturaArea = geo.latlonToGrid("/home/valia/Desktop/NaturaCentroidsFrance.csv");
@@ -146,7 +146,7 @@ public class LowSpeed {
 
                     return new NaturaEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(),lat, lon);
                 });
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         Pattern<DynamicShipClass, DynamicShipClass> turnpattern = Pattern.<DynamicShipClass>begin("start")
                 .where(new SimpleCondition<DynamicShipClass>() {
 
@@ -183,7 +183,7 @@ public class LowSpeed {
                     return new InstantaneousTurnEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(), degrees);
                 });
 
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         DataStream<SimpleEvent> connectedStreams = natura.union(turn, gap, lowspeed);
 
         //turn.print();
@@ -221,6 +221,7 @@ public class LowSpeed {
             }
         }).writeAsText("output.txt", FileSystem.WriteMode.OVERWRITE);
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         Pattern<SimpleEvent, ?> complexLow = Pattern.<SimpleEvent>begin("start")
                 .subtype(NaturaEvent.class)
                 .where(new SimpleCondition<NaturaEvent>() {
@@ -288,7 +289,7 @@ public class LowSpeed {
         }).writeAsText("lowSpeed.txt");
 
 
-
+////////////////////////////////////////////////////////////////////////////
         env.execute();
     }
 }
