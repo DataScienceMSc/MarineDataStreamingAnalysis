@@ -24,10 +24,7 @@ public class SimpleConditionStreamGenerator {
     SimpleConditionStreamGenerator(){};
 
 
-    DataStream<DynamicShipClass> init(java.lang.String path){
-
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
+    DataStream<DynamicShipClass> init(java.lang.String path, StreamExecutionEnvironment env) throws Exception{
 
         TextInputFormat format = new TextInputFormat(new org.apache.flink.core.fs.Path(path));
         DataStream<java.lang.String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);

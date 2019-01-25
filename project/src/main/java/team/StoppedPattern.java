@@ -72,7 +72,7 @@ public class StoppedPattern {
 
 
 
-        Pattern<DynamicShipClass, DynamicShipClass> turnPattern = Pattern.<DynamicShipClass>begin("start")
+        Pattern<DynamicShipClass, DynamicShipClass> increasingSpeed = Pattern.<DynamicShipClass>begin("start")
                 .where(new SimpleCondition<DynamicShipClass>() {
 
                     @Override
@@ -93,7 +93,7 @@ public class StoppedPattern {
                     }
                 });
 
-        DataStream<SimpleEvent> turn =  CEP.pattern(parsedStream, turnPattern)
+        DataStream<SimpleEvent> turn =  CEP.pattern(parsedStream, increasingSpeed)
                 .select((Map<String, List<DynamicShipClass>> pattern) -> {
                     long startTime=0;
                     long endTime= 0;

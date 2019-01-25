@@ -19,13 +19,15 @@ public class IllegalShipping {
         SimpleConditionStreamGenerator generator= new SimpleConditionStreamGenerator();
 
         //Parsing input stream, indexing by mmsi
-        DataStream<DynamicShipClass> parsedStream=generator.init(path);
+        DataStream<DynamicShipClass> parsedStream=generator.init(path, env);
 
         //generating a stream of InstuntaneousTurn events
         DataStream<SimpleEvent> InstantaneousTurnStream= generator.generateStream(parsedStream,streamType.InstantaneousTurn);
 
         //It compiles :)
         System.out.print("Hooooray");
+
+        env.execute();
     }
 
 
