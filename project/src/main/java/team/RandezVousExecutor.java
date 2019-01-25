@@ -5,7 +5,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 
-public class ComplexRendezVous {
+public class RandezVousExecutor {
 
 
     public static void main(String[] args) throws Exception {
@@ -25,7 +25,7 @@ public class ComplexRendezVous {
         DataStream<SimpleEvent> StoppedStream= generator.generateStream(parsedStream,streamType.Stopped);
 
         //generating a stream of Gap Events
-        //DataStream<SimpleEvent> GapStream= generator.generateStream(parsedStream,streamType.Stopped);
+        DataStream<SimpleEvent> GapStream= generator.generateStream(parsedStream,streamType.Stopped);
 
         //concatenating the two streams
         DataStream<SimpleEvent> connectedStreams = GapStream.union(StoppedStream)

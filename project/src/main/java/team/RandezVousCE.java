@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 
-public class RandezVousCE1 {
+public class RandezVousCE {
 
-    RandezVousCE1(){};
+    RandezVousCE(){};
 
     static void GenerateComplexEvents(DataStream<SimpleEvent> parsedStream,  String outputFile) throws Exception {
 
