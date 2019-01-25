@@ -18,21 +18,11 @@ import java.util.List;
 import java.util.Map;
 
 
-public class StoppedPattern {
+public class Stopped {
 
-    public static void main(String[] args) throws Exception {
+    Stopped() {};
 
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
-
-        String path = "/Users/thanasiskaridis/Desktop/FarFromPorts.csv";
-        TextInputFormat format = new TextInputFormat(
-                new org.apache.flink.core.fs.Path(path));
-
-        DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
-        DataStream<DynamicShipClass> parsedStream = inputStream
-                .map(line -> DynamicShipClass.fromString(line))
-                .keyBy(element -> element.getmmsi());
+    static DataStream<SimpleEvent> generateSimpleEvents(DataStream<DynamicShipClass> parsedStream) throws Exception {
 
         Pattern<DynamicShipClass, ?> stoppedShip = Pattern.<DynamicShipClass>begin("start"
                 , AfterMatchSkipStrategy.skipPastLastEvent())
@@ -40,7 +30,7 @@ public class StoppedPattern {
 
                     @Override
                     public boolean filter(DynamicShipClass value) throws Exception {
-                        return value.getSpeed()<0.5;
+                        return value.getSpeed() < 0.5;
                     }
                 })
                 .oneOrMore().greedy().consecutive()
@@ -56,19 +46,21 @@ public class StoppedPattern {
 
         DataStream<SimpleEvent> stopped = CEP.pattern(parsedStream, stoppedShip).
                 select((Map<String, List<DynamicShipClass>> pattern) -> {
-                    long startTime=0;
-                    long endTime= 0;
-                    System.out.println("Match Found1!");
-                    for (Map.Entry<String, List<DynamicShipClass>> entry: pattern.entrySet()) {
-                        startTime= entry.getValue().get(0).getTs();
-                        endTime= entry.getValue().get(entry.getValue().size()-1).getTs();
+                    long startTime = 0;
+                    long endTime = 0;
+                    System.out.println("Match Found!");
+                    for (Map.Entry<String, List<DynamicShipClass>> entry : pattern.entrySet()) {
+                        startTime = entry.getValue().get(0).getTs();
+                        endTime = entry.getValue().get(entry.getValue().size() - 1).getTs();
                     }
-                    DynamicShipClass temp=pattern.get("start").get(0);
-                    return new StoppedEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(),temp.getSpeed());
+                    DynamicShipClass temp = pattern.get("start").get(0);
+                    return new StoppedEvent(temp.getmmsi(), startTime, endTime, temp.getGridId(), temp.getSpeed());
                 });
+        return stopped;
+    }
+}
 
-
-
+/*
 
 
 
@@ -160,3 +152,4 @@ public class StoppedPattern {
 
 
 }
+*/

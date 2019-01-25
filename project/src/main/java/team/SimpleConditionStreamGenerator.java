@@ -42,24 +42,40 @@ public class SimpleConditionStreamGenerator {
 
         switch (type){
             case Stopped:
-                break;
+                Stopped stopped = new Stopped();
+                try {
+                    SimpleEventStream=stopped.generateSimpleEvents(stream);
+                }
+                catch (Exception e) {
+                    System.out.print(errorMsg + "Stopped Events");
+                }
+
+
             case LowSpeed:
                 break;
+
+
             case SpeedChange:
                 break;
+
+
             case InstantaneousTurn:
-                InstantaneousTurn simpleEvent = new InstantaneousTurn();
+                InstantaneousTurn instTurn = new InstantaneousTurn();
                 try {
-                    SimpleEventStream=simpleEvent.generateSimpleEvents(stream);
+                    SimpleEventStream=instTurn.generateSimpleEvents(stream);
                 }
                 catch (Exception e) {
                     System.out.print(errorMsg + "Instantaneous Turn Events");
                 }
                 break;
-             default:
+
+
+
+            default:
                  System.out.println("Unable to generate stream");
                  System.exit(1);
         }
+
         return SimpleEventStream;
     }
 
