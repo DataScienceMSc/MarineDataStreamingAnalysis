@@ -11,12 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 
-public class RendezVouz {
+public class RendezVouzCE {
 
-    RendezVouz() {
-    }
-
-    ;
+    RendezVouzCE() {};
 
     static void GenerateComplexEvents(DataStream<SimpleEvent> parsedStream, String outputFile) throws Exception {
 
