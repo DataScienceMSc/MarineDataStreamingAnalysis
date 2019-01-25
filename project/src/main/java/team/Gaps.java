@@ -45,11 +45,10 @@ public class Gaps {
                 });
 
         DataStream<SimpleEvent> gapStream = CEP.pattern(parsedStream, increasingSpeed).select((Map<String, List<DynamicShipClass>> pattern) -> {
-            DynamicShipClass temp = pattern.get("start").get(0);
-            long startTime = pattern.get("startGap").get(0).getTs();
-            long endTime = pattern.get("end").get(0).getTs();
-
-            System.out.println("Match");
+            System.out.println("Match Found!");
+            long startTime=pattern.get("startGap").get(0).getTs();
+            long endTime=pattern.get("end").get(0).getTs();
+            DynamicShipClass temp=pattern.get("startGap").get(0);
             return new GapEvent(temp.getmmsi(), startTime, endTime, temp.getGridId(), (startTime - endTime));
 
         });

@@ -51,8 +51,15 @@ public class SimpleConditionStreamGenerator {
                     System.out.print(errorMsg + "Stopped Events");
                 }
 
-
+                break;
             case LowSpeed:
+                LowSpeed lowSpeed = new LowSpeed();
+                try {
+                    SimpleEventStream=lowSpeed.generateSimpleEvents(stream);
+                }
+                catch (Exception e) {
+                    System.out.print(errorMsg + "Low Speed Events");
+                }
                 break;
 
 
