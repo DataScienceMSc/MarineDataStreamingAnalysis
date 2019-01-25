@@ -1,9 +1,9 @@
 package team;
 
 
-public class Velocity {
+public class TO_BE_DELETED_Velocity {
 
-	public Velocity(DynamicShipClass shipState, DynamicShipClass previousState) {
+	public TO_BE_DELETED_Velocity(DynamicShipClass shipState, DynamicShipClass previousState) {
 
 		this.velValue = calculateVelocity(shipState, previousState);
 		this.velHeading = headingDiff(shipState, previousState);

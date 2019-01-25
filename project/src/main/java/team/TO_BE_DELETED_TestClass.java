@@ -8,12 +8,12 @@ import java.io.Serializable;
 //import java.util.Locale;
 
 
-public class TestClass implements Comparable<TestClass>, Serializable {
+public class TO_BE_DELETED_TestClass implements Comparable<TO_BE_DELETED_TestClass>, Serializable {
 
 	//private static transient DateTimeFormatter timeFormatter =
 	//		DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.US).withZoneUTC(); //na valoume to timestamp se wra
 
-	public TestClass() {
+	public TO_BE_DELETED_TestClass() {
 
 		this.mmsi = mmsi;
 		this.turn = turn;
@@ -21,7 +21,7 @@ public class TestClass implements Comparable<TestClass>, Serializable {
 		this.ts = ts;
 	}
 
-	public TestClass(int mmsi, int turn, int speed, int ts) {
+	public TO_BE_DELETED_TestClass(int mmsi, int turn, int speed, int ts) {
 
 		this.mmsi = mmsi;
 		this.turn = turn;
@@ -52,14 +52,14 @@ public class TestClass implements Comparable<TestClass>, Serializable {
 		return sb.toString();
 	}
 
-	public static TestClass fromString(String line) {
+	public static TO_BE_DELETED_TestClass fromString(String line) {
 
 		String[] tokens = line.split(",");
 		if (tokens.length != 4) {
 			throw new RuntimeException("Invalid record: " + line);
 		}
 
-		TestClass test = new TestClass();
+		TO_BE_DELETED_TestClass test = new TO_BE_DELETED_TestClass();
 		try {
 			test.mmsi = tokens[0].length() > 0 ? Integer.parseInt(tokens[0]) : 0;
 			test.turn = tokens[1].length() > 0 ? Integer.parseInt(tokens[1]) : 0;
@@ -98,7 +98,7 @@ public class TestClass implements Comparable<TestClass>, Serializable {
 		return speed;
 	}
 
-	public int compareTo(TestClass o) {
+	public int compareTo(TO_BE_DELETED_TestClass o) {
 		return this.getTs() - o.getTs();
 	}
 

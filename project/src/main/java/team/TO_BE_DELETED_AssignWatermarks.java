@@ -3,7 +3,7 @@ package team;
 import org.apache.flink.streaming.api.functions.AssignerWithPunctuatedWatermarks;
 import org.apache.flink.streaming.api.watermark.Watermark;
 
-public class AssignWatermarks implements AssignerWithPunctuatedWatermarks<DynamicShipClass> {
+public class TO_BE_DELETED_AssignWatermarks implements AssignerWithPunctuatedWatermarks<DynamicShipClass> {
     @Override
     public long extractTimestamp(DynamicShipClass event, long previousElementTimestamp) {
         return event.getEventTime();

@@ -20,12 +20,12 @@ import java.util.Properties;
 
 public class FarFromPorts {
 
-    public static void main(String[] args) throws Exception {
+    FarFromPorts(){}
 
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-        env.setParallelism(1);
 
+    static void outputSimpleEvents(DataStream<DynamicShipClass> parsedStream, String outputFile) throws Exception {
+
+        /*StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", "localhost:9092");
         properties.setProperty("group.id", "test");
@@ -36,16 +36,12 @@ public class FarFromPorts {
         // create the data stream
         DataStream<String> inputStream = env.addSource(myConsumer);
 
+        */
 
         GeoUtils geo = new GeoUtils();
-        ArrayList<Integer> portsOfBrittany = geo.latlonToGrid("/Users/thanasiskaridis/Desktop/latlon.csv");
+        ArrayList<Integer> portsOfBrittany = geo.latlonToGrid("./inputFiles/latlon.csv");
 
-//        String path = "/Users/thanasiskaridis/Desktop/nari_dynamic.csv";
-//        TextInputFormat format = new TextInputFormat(
-//                new org.apache.flink.core.fs.Path(path));
-//        DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
-
-        DataStream<DynamicShipClass> parsedStream = inputStream
+       /* DataStream<DynamicShipClass> parsedStream = inputStream
                 .map(line -> DynamicShipClass.fromString(line,geo))
                 .assignTimestampsAndWatermarks(new AscendingTimestampExtractor<DynamicShipClass>() {
 
@@ -54,6 +50,7 @@ public class FarFromPorts {
                         return element.getEventTime();
                     }
                 }).keyBy(DynamicShipClass::getmmsi);
+       */
 
         Pattern<DynamicShipClass, DynamicShipClass> increasingSpeed = Pattern.<DynamicShipClass>begin("openSea", AfterMatchSkipStrategy.skipPastLastEvent())
                 .where(new SimpleCondition<DynamicShipClass>() {
@@ -104,7 +101,6 @@ public class FarFromPorts {
                 }
                 collector.collect(str.toString());
             }
-        }).writeAsText("/Users/thanasiskaridis/Desktop/FarFromPorts.txt", FileSystem.WriteMode.OVERWRITE);
-        env.execute();
+        }).writeAsText(outputFile, FileSystem.WriteMode.OVERWRITE);
     }
 }

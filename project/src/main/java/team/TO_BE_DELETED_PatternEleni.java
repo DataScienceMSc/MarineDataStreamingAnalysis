@@ -24,7 +24,7 @@ import java.util.Properties;
 import org.apache.flink.util.Collector;
 
 
-public class PatternEleni {
+public class TO_BE_DELETED_PatternEleni {
 
     public static void main(String[] args) throws Exception {
 

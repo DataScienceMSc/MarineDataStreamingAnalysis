@@ -5,7 +5,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 
-public class ComplexExample {
+public class StopAndTurnExecutor {
 
 
     public static void main(String[] args) throws Exception {
@@ -40,6 +40,4 @@ public class ComplexExample {
 
         env.execute();
     }
-
-
 }

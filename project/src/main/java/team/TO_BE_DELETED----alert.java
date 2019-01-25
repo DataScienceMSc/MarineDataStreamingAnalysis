@@ -1,4 +1,4 @@
-package team;
+/*package team;
 
 
 public class alert extends DynamicShipClass {
@@ -40,7 +40,8 @@ public class alert extends DynamicShipClass {
     public int hashCode() {
         return ((int)this.mmsi);
     }
-*/
+
 
 
 }
+*/

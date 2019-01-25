@@ -15,7 +15,8 @@ enum streamType{
     SpeedChange,
     InstantaneousTurn,
     Stopped,
-    LowSpeed
+    LowSpeed,
+    Gap
 } ;
 
 
@@ -69,7 +70,15 @@ public class SimpleConditionStreamGenerator {
                 }
                 break;
 
-
+            case Gap:
+                Gaps gap = new Gaps();
+                try {
+                    SimpleEventStream=gap.generateSimpleEvents(stream);
+                }
+                catch (Exception e) {
+                    System.out.print(errorMsg + "Gap Events");
+                }
+                break;
 
             default:
                  System.out.println("Unable to generate stream");
