@@ -3,7 +3,6 @@ package team;
 import org.apache.flink.api.java.io.TextInputFormat;
 import org.apache.flink.cep.CEP;
 import org.apache.flink.cep.PatternFlatSelectFunction;
-import org.apache.flink.cep.nfa.aftermatch.AfterMatchSkipStrategy;
 import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.cep.pattern.conditions.IterativeCondition;
 import org.apache.flink.cep.pattern.conditions.SimpleCondition;
@@ -91,22 +90,6 @@ public class SpeedChangePattern {
             }
         }).writeAsText("/home/valia/Desktop/speedChange.csv", FileSystem.WriteMode.OVERWRITE);
 
-
-//        DataStream<SimpleEvent> turn =  CEP.pattern(parsedStream, speedChange)
-//                .select((Map<String, List<DynamicShipClass>> pattern) -> {
-//                    long startTime=0;
-//                    long endTime= 0;
-//                    double SpeedChange=0;
-//                    System.out.println("Match Found!");
-//                    for (Map.Entry<String, List<DynamicShipClass>> entry: pattern.entrySet()) {
-//                        startTime= entry.getValue().get(0).getTs();
-//                        endTime= entry.getValue().get(entry.getValue().size()-1).getTs();
-//                        SpeedChange=Math.abs(entry.getValue().get(0).getSpeed()-
-//                            entry.getValue().get(0).getSpeed());
-//                    }
-//                    DynamicShipClass temp=pattern.get("start").get(0);
-//                    return new SpeedChangeEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(), SpeedChange);
-//                });
 
         env.execute();
     }

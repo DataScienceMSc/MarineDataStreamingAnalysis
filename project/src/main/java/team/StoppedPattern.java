@@ -67,7 +67,12 @@ public class StoppedPattern {
                     return new StoppedEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(),temp.getSpeed());
                 });
 
-        Pattern<DynamicShipClass, DynamicShipClass> increasingSpeed = Pattern.<DynamicShipClass>begin("start")
+
+
+
+
+
+        Pattern<DynamicShipClass, DynamicShipClass> turnPattern = Pattern.<DynamicShipClass>begin("start")
                 .where(new SimpleCondition<DynamicShipClass>() {
 
                     @Override
@@ -88,7 +93,7 @@ public class StoppedPattern {
                     }
                 });
 
-        DataStream<SimpleEvent> turn =  CEP.pattern(parsedStream, increasingSpeed)
+        DataStream<SimpleEvent> turn =  CEP.pattern(parsedStream, turnPattern)
                 .select((Map<String, List<DynamicShipClass>> pattern) -> {
                     long startTime=0;
                     long endTime= 0;
