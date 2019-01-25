@@ -81,8 +81,6 @@ public class GeoUtils implements Serializable {
 				grid = mapToGridCell(ints[0], ints[1]);
 				result.add(grid);
                 System.out.println(" grid: "+ grid +" lat: " + ints[1] + " lon: "+ ints[0] + "\n");
-
-
 		}
 		return result;
 	}

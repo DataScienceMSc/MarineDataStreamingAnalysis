@@ -24,9 +24,9 @@ public class naturaAreas {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         GeoUtils geo = new GeoUtils();
-        ArrayList<Integer> naturaArea = geo.latlonToGrid("inputFiles/NaturaCentroidsFrance.csv");
+        ArrayList<Integer> naturaArea = geo.latlonToGrid("/home/valia/Desktop/NaturaCentroidsFrance.csv");
 
-        String path = "inputFiles/FarFromPorts_small.csv";
+        String path = "/home/valia/Desktop/FarFromPorts.csv";
         TextInputFormat format = new TextInputFormat(
                 new org.apache.flink.core.fs.Path(path));
         DataStream<String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
