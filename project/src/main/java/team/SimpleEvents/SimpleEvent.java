@@ -1,7 +1,5 @@
 package team.SimpleEvents;
 
-import java.util.Objects;
-
 public abstract class SimpleEvent {
 
     private int mmsi;
@@ -31,22 +29,6 @@ public abstract class SimpleEvent {
 
     public int getGridId() {
         return gridId;
-    }
-
-    public void setMmsi(int mmsi) {
-        this.mmsi = mmsi;
-    }
-
-    public void setTsStart(long tsStart) {
-        this.tsStart = tsStart;
-    }
-
-    public void setTsEnd(long tsEnd) {
-        this.tsEnd = tsEnd;
-    }
-
-    public void setGridId(int gridId) {
-        this.gridId = gridId;
     }
 
     @Override
