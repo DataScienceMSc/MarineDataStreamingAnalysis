@@ -10,12 +10,12 @@ import team.SimpleEvents.*;
 
 
 enum streamType{
-    SpeedChange,
     InstantaneousTurn,
     Stopped,
     LowSpeed,
     Gap,
-    StoppedAfterMoving
+    StoppedAfterMoving,
+    Natura
 } ;
 
 
@@ -61,11 +61,6 @@ public class SimpleConditionStreamGenerator {
                 }
                 break;
 
-
-            case SpeedChange:
-                break;
-
-
             case InstantaneousTurn:
                 InstantaneousTurn instTurn = new InstantaneousTurn();
                 try {
@@ -92,6 +87,15 @@ public class SimpleConditionStreamGenerator {
                 }
                 catch (Exception e) {
                     System.out.print(errorMsg + "Stopped-After-Moving Events");
+                }
+                break;
+            case Natura:
+                NaturaAreas naturaAreas = new NaturaAreas();
+                try {
+                    SimpleEventStream=naturaAreas.generateSimpleEvents(stream);
+                }
+                catch (Exception e) {
+                    System.out.print(errorMsg + "Natura Events");
                 }
                 break;
 

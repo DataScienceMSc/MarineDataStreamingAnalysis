@@ -27,14 +27,14 @@ public class RandezVousExecutor {
         DataStream<SimpleEvent> StoppedStream= generator.generateStream(parsedStream,streamType.Stopped);
 
         //generating a stream of Gap Events
-        DataStream<SimpleEvent> GapStream= generator.generateStream(parsedStream,streamType.Stopped);
+        DataStream<SimpleEvent> GapStream= generator.generateStream(parsedStream,streamType.Gap);
 
         //concatenating the two streams
         DataStream<SimpleEvent> connectedStreams = GapStream.union(StoppedStream)
                 .keyBy(element -> element.getGridId());
 
 
-        //Generating a complex event from the above (stop and then turn)
+        //Generating a complex event
         RandezVousCE CE= new RandezVousCE();
         CE.GenerateComplexEvents(connectedStreams, "./results/RandezVous.csv");
 

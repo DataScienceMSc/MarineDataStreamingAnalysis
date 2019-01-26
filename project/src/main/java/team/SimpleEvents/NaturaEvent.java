@@ -1,6 +1,4 @@
-package team;
-
-import team.SimpleEvents.SimpleEvent;
+package team.SimpleEvents;
 
 import java.util.Objects;
 
