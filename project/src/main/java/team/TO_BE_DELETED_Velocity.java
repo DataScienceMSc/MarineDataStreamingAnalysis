@@ -1,6 +1,8 @@
 package team;
 
 
+import team.General.DynamicShipClass;
+
 public class TO_BE_DELETED_Velocity {
 
 	public TO_BE_DELETED_Velocity(DynamicShipClass shipState, DynamicShipClass previousState) {

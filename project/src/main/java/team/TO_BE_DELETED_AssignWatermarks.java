@@ -2,6 +2,7 @@ package team;
 
 import org.apache.flink.streaming.api.functions.AssignerWithPunctuatedWatermarks;
 import org.apache.flink.streaming.api.watermark.Watermark;
+import team.General.DynamicShipClass;
 
 public class TO_BE_DELETED_AssignWatermarks implements AssignerWithPunctuatedWatermarks<DynamicShipClass> {
     @Override

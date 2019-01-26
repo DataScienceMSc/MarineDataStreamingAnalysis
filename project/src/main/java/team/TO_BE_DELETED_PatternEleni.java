@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.flink.util.Collector;
+import team.General.DynamicShipClass;
 
 
 public class TO_BE_DELETED_PatternEleni {

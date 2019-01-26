@@ -1,5 +1,7 @@
 package team;
 
+import team.SimpleEvents.SimpleEvent;
+
 import java.util.Objects;
 
 public class NaturaEvent extends SimpleEvent {

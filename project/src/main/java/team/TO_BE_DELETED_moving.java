@@ -1,5 +1,7 @@
 package team;
 
+import team.General.DynamicShipClass;
+
 public class TO_BE_DELETED_moving extends DynamicShipClass {
 
 

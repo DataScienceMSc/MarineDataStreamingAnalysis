@@ -10,7 +10,8 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.FileProcessingMode;
 import org.apache.flink.util.Collector;
-import java.util.ArrayList;
+import team.General.DynamicShipClass;
+
 import java.util.List;
 import java.util.Map;
 
