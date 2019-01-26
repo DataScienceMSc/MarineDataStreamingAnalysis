@@ -21,7 +21,7 @@ public class SimplePatternExecutor {
         DataStream<DynamicShipClass> parsedStream = generator.init(path, env);
 
 
-        Acceleration acceleration = new Acceleration();
+       /* Acceleration acceleration = new Acceleration();
         acceleration.outputSimpleEvents(parsedStream, "./results/Acceleration.txt");
 
         FarFromPorts farFromPorts = new FarFromPorts();
@@ -38,8 +38,11 @@ public class SimplePatternExecutor {
 
 
         UnderWay underWay = new UnderWay();
-        underWay.outputSimpleEvents(parsedStream, "./results/underWay.txt");
+        underWay.outputSimpleEvents(parsedStream, "./results/underWay.txt");*/
 
+
+        RendezVousSimple randezVous = new RendezVousSimple();
+        randezVous.outputSimpleEvents(parsedStream,"./results/randezVous.txt");
 
         //It compiles :)
         System.out.print("Hooooray");
