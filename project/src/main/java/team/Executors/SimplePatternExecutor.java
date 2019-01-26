@@ -43,8 +43,11 @@ public class SimplePatternExecutor {
         RendezVousSimple randezVous = new RendezVousSimple();
         randezVous.outputSimpleEvents(parsedStream,"./results/randezVous.txt");*/
 
-        Drift driftShip = new Drift();
-        driftShip.outputSimpleEvents(parsedStream, "./results/drift.txt");
+        //Drift driftShip = new Drift();
+        //driftShip.outputSimpleEvents(parsedStream, "./results/drift.txt");
+
+        Following follow = new Following();
+        follow.outputSimpleEvents(parsedStream, "./results/following.txt");
 
         //It compiles :)
         System.out.print("Hooooray");

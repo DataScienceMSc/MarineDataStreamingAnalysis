@@ -16,25 +16,19 @@ import java.util.Map;
 
 import static java.lang.Math.abs;
 
-public class Drift {
+public class Following {
 
-    public Drift(){};
+    public Following(){};
 
     public static void outputSimpleEvents(DataStream<DynamicShipClass> parsedStream, String outputFile) throws Exception {
 
-        Pattern<DynamicShipClass, DynamicShipClass> drift = Pattern.<DynamicShipClass>begin("start", AfterMatchSkipStrategy.skipPastLastEvent())
+        Pattern<DynamicShipClass, DynamicShipClass> following = Pattern.<DynamicShipClass>begin("start", AfterMatchSkipStrategy.skipPastLastEvent())
                 .where(new SimpleCondition<DynamicShipClass>() {
 
                     @Override
                     public boolean filter(DynamicShipClass value) throws Exception {
-                        System.out.println("Match stopped 1");
-                        double heading;
-                        if (abs(value.getHeading() - value.getCourse()) > 180)
-                            heading = 360 - abs(value.getHeading() - value.getCourse());
-                        else
-                            heading = abs(value.getHeading() - value.getCourse());
-
-                        return heading > 45;
+                        //System.out.println("Match following 1");
+                        return value.getSpeed() > 15.0;
                     }
                 }).oneOrMore().consecutive().next("end").where(new IterativeCondition<DynamicShipClass>() {
 
@@ -46,10 +40,12 @@ public class Drift {
                             contex="start";
                         }
                         for (DynamicShipClass event : ctx.getEventsForPattern(contex)) {
-                                if (abs(event.getTs()) - value.getTs() < 5 * 60 && (value.getSpeed() > 5.0))
+                                if ((abs(event.getTs() - value.getTs()) < 2 * 60) && (event.getmmsi() != value.getmmsi()) && ((value.getSpeed() - event.getSpeed()) > 5.0))
                                 {
-                                    return true;
-                                }
+                                    System.out.println("MAtch following 2");
+                                    System.out.println("event ts: " + event.getTs());
+                                    System.out.println("value ts: " + value.getTs());
+                                    return true;}
                         }
                         return false;
                     }
@@ -57,7 +53,7 @@ public class Drift {
 
 
 
-        CEP.pattern(parsedStream, drift).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
+        CEP.pattern(parsedStream, following).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
 
             @Override
             public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
@@ -76,6 +72,10 @@ public class Drift {
                         str.append(t.getLat());
                         str.append(",   ");
                         str.append(t.getLon());
+                        str.append(",   ");
+                        str.append(t.getHeading());
+                        str.append(",   ");
+                        str.append(t.getCourse());
                         str.append("\n");
                     }
                 }
