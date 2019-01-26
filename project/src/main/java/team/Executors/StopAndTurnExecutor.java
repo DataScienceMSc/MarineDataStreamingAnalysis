@@ -27,7 +27,7 @@ public class StopAndTurnExecutor {
         DataStream<SimpleEvent> InstantaneousTurnStream= generator.generateStream(parsedStream,streamType.InstantaneousTurn);
 
         //generating a stream of Stopped events
-        DataStream<SimpleEvent> StoppedStream= generator.generateStream(parsedStream,streamType.InstantaneousTurn);
+        DataStream<SimpleEvent> StoppedStream= generator.generateStream(parsedStream,streamType.Stopped);
 
         //concatenating the two streams
         DataStream<SimpleEvent> connectedStreams = StoppedStream.union(InstantaneousTurnStream)

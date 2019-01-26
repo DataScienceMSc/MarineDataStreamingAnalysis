@@ -36,7 +36,6 @@ public class SimplePatternExecutor {
         IncreasingSpeed increasingSpeed = new IncreasingSpeed();
         increasingSpeed.outputSimpleEvents(parsedStream, "./results/increasingSpeed.txt");
 
-
         UnderWay underWay = new UnderWay();
         underWay.outputSimpleEvents(parsedStream, "./results/underWay.txt");*/
 
