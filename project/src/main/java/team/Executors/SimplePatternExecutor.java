@@ -37,11 +37,14 @@ public class SimplePatternExecutor {
         increasingSpeed.outputSimpleEvents(parsedStream, "./results/increasingSpeed.txt");
 
         UnderWay underWay = new UnderWay();
-        underWay.outputSimpleEvents(parsedStream, "./results/underWay.txt");*/
+        underWay.outputSimpleEvents(parsedStream, "./results/underWay.txt");
 
 
         RendezVousSimple randezVous = new RendezVousSimple();
-        randezVous.outputSimpleEvents(parsedStream,"./results/randezVous.txt");
+        randezVous.outputSimpleEvents(parsedStream,"./results/randezVous.txt");*/
+
+        Drift driftShip = new Drift();
+        driftShip.outputSimpleEvents(parsedStream, "./results/drift.txt");
 
         //It compiles :)
         System.out.print("Hooooray");
