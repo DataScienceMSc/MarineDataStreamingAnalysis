@@ -1,12 +1,14 @@
 package team.Executors;
 
 
-import org.apache.flink.api.java.io.TextInputFormat;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.source.FileProcessingMode;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
 import team.General.DynamicShipClass;
 import team.SimpleEvents.*;
+
+import java.util.Properties;
 
 
 enum streamType{
@@ -21,20 +23,22 @@ enum streamType{
 
 public class SimpleConditionStreamGenerator {
 
-    SimpleConditionStreamGenerator(){};
 
 
-    DataStream<DynamicShipClass> init(java.lang.String path, StreamExecutionEnvironment env) throws Exception{
+    public static DataStream<String> getKafkaStream(StreamExecutionEnvironment env)
+    {
+        Properties properties = new Properties();
+        properties.setProperty("bootstrap.servers", "localhost:9092");
+        properties.setProperty("group.id", "group21");
+        // create Kafka's consumer
+        FlinkKafkaConsumer09<String> myConsumer = new FlinkKafkaConsumer09<>("FinalOpenSeaEntries2", new SimpleStringSchema(), properties);
+        // create the data stream
+        DataStream<String> inputStream = env.addSource(myConsumer);
 
-        TextInputFormat format = new TextInputFormat(new org.apache.flink.core.fs.Path(path));
-        DataStream<java.lang.String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
-
-        return inputStream.map(line -> DynamicShipClass.fromString(line)).keyBy(element -> element.getGridId());   //to run randezVous pattern change to element.getGridId()
-
+        return inputStream;
     }
 
-
-    DataStream<SimpleEvent> generateStream(DataStream<DynamicShipClass> stream ,streamType type){
+    public static DataStream<SimpleEvent> generateStream(DataStream<DynamicShipClass> stream ,streamType type){
 
         String errorMsg= "Exception while generating simple event stream of:";
 

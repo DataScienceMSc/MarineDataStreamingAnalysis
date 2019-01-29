@@ -36,17 +36,14 @@ public class Gaps {
                         }
                         for (DynamicShipClass event : ctx.getEventsForPattern(contex)) {
 
-                            if (previous.ts - event.ts >= 10 * 60 * 2)
-                                return true;
-                            else
-                                return false;
+                            return (previous.ts - event.ts >= 10 * 60 * 2);
                         }
                         return false;
                     }
                 });
 
         DataStream<SimpleEvent> gapStream = CEP.pattern(parsedStream, increasingSpeed).select((Map<String, List<DynamicShipClass>> pattern) -> {
-            System.out.println("Match Found!");
+            System.out.println("Gap Found!");
             long startTime=pattern.get("startGap").get(0).getTs();
             long endTime=pattern.get("end").get(0).getTs();
             DynamicShipClass temp=pattern.get("startGap").get(0);

@@ -1,8 +1,10 @@
 package team.Executors;
 
 
+import org.apache.flink.api.java.io.TextInputFormat;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.source.FileProcessingMode;
 import team.ComplexEvents.StopAndTurnCE;
 import team.General.DynamicShipClass;
 import team.SimpleEvents.SimpleEvent;
@@ -16,18 +18,19 @@ public class StopAndTurnExecutor {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
-        String path = "./inputFiles/FarFromPorts.csv";
 
-        SimpleConditionStreamGenerator generator= new SimpleConditionStreamGenerator();
+        String path="./results/FarFromPorts.csv";
 
-        //Parsing input stream, indexing by mmsi
-        DataStream<DynamicShipClass> parsedStream=generator.init(path, env);
+        TextInputFormat format = new TextInputFormat(new org.apache.flink.core.fs.Path(path));
+        DataStream<java.lang.String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
+
+        DataStream<DynamicShipClass> parsedStream= inputStream.map(line -> DynamicShipClass.fromString(line)).keyBy(element -> element.getmmsi());
 
         //generating a stream of InstuntaneousTurn events
-        DataStream<SimpleEvent> InstantaneousTurnStream= generator.generateStream(parsedStream,streamType.InstantaneousTurn);
+        DataStream<SimpleEvent> InstantaneousTurnStream= SimpleConditionStreamGenerator.generateStream(parsedStream,streamType.InstantaneousTurn);
 
         //generating a stream of Stopped events
-        DataStream<SimpleEvent> StoppedStream= generator.generateStream(parsedStream,streamType.Stopped);
+        DataStream<SimpleEvent> StoppedStream= SimpleConditionStreamGenerator.generateStream(parsedStream,streamType.Stopped);
 
         //concatenating the two streams
         DataStream<SimpleEvent> connectedStreams = StoppedStream.union(InstantaneousTurnStream)
@@ -35,12 +38,13 @@ public class StopAndTurnExecutor {
 
 
         //Generating a complex event from the above (stop and then turn)
-        StopAndTurnCE CE= new StopAndTurnCE();
-        CE.GenerateComplexEvents(connectedStreams, "./results/stopAndTurn.csv");
+        StopAndTurnCE CE= new StopAndTurnCE(connectedStreams, "./results/StopAndTurn.csv",env);
+
+        Thread t= new Thread(CE);
+        t.start();
 
         //It compiles :)
         System.out.print("Hooooray");
 
-        env.execute();
     }
 }

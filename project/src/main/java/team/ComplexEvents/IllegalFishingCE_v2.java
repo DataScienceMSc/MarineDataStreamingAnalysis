@@ -6,6 +6,7 @@ import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.cep.pattern.conditions.SimpleCondition;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
 import team.SimpleEvents.*;
 
@@ -13,11 +14,21 @@ import team.SimpleEvents.*;
 import java.util.List;
 import java.util.Map;
 
-public class IllegalFishingCE_v2 {
+public class IllegalFishingCE_v2 implements Runnable {
 
-    public IllegalFishingCE_v2(){};
+    DataStream<SimpleEvent> parsedStream;
+    String outputFile;
+    StreamExecutionEnvironment env;
 
-    public static void GenerateComplexEvents(DataStream<SimpleEvent> parsedStream, String outputFile) throws Exception {
+
+    public IllegalFishingCE_v2(DataStream<SimpleEvent> parsedStream, String outputFile,StreamExecutionEnvironment env) {
+        this.parsedStream = parsedStream;
+        this.outputFile = outputFile;
+        this.env=env;
+    }
+
+    public  void run(){
+        try{
         Pattern<SimpleEvent, ?> complexLow = Pattern.<SimpleEvent>begin("start")
                 .subtype(NaturaEvent.class)
                 .where(new SimpleCondition<NaturaEvent>() {
@@ -50,5 +61,10 @@ public class IllegalFishingCE_v2 {
                 collector.collect(str.toString());
             }
         }).writeAsText(outputFile, FileSystem.WriteMode.OVERWRITE);
-    }
+        env.execute();
+        }
+        catch(Exception e){
+            System.out.println(e.getCause());
+            }
+        }
 }

@@ -80,7 +80,7 @@ public class GeoUtils implements Serializable {
 				ints[1] = Double.parseDouble(parts[1]);
 				grid = mapToGridCell(ints[0], ints[1]);
 				result.add(grid);
-                System.out.println(" grid: "+ grid +" lat: " + ints[1] + " lon: "+ ints[0] + "\n");
+                //System.out.println(" grid: "+ grid +" lat: " + ints[1] + " lon: "+ ints[0] + "\n");
 		}
 		return result;
 	}
