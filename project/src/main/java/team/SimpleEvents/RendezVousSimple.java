@@ -8,17 +8,40 @@ import org.apache.flink.cep.pattern.conditions.IterativeCondition;
 import org.apache.flink.cep.pattern.conditions.SimpleCondition;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExtractor;
 import org.apache.flink.util.Collector;
 import team.General.DynamicShipClass;
 
 import java.util.List;
 import java.util.Map;
 
-public class RendezVousSimple {
+public class RendezVousSimple implements Runnable{
 
-    public RendezVousSimple(){};
 
-    public static void outputSimpleEvents(DataStream<DynamicShipClass> parsedStream, String outputFile) throws Exception {
+        static DataStream<String> inputStream;
+        static String outputFile;
+        static StreamExecutionEnvironment env;
+
+        public RendezVousSimple(DataStream<String> stream, String outputFile, StreamExecutionEnvironment env) {
+            this.inputStream = stream;
+            this.outputFile = outputFile;
+            this.env=env;
+
+        }
+
+
+        public void run(){
+            try{
+                DataStream<DynamicShipClass> parsedStream = inputStream
+                        .map(line -> DynamicShipClass.fromString(line))
+                        .assignTimestampsAndWatermarks(new AscendingTimestampExtractor<DynamicShipClass>() {
+                            @Override
+                            public long extractAscendingTimestamp(DynamicShipClass element) {
+                                return element.getEventTime();
+                            }
+
+                        });
 
         Pattern<DynamicShipClass, DynamicShipClass> stoppedShip = Pattern.<DynamicShipClass>begin("start", AfterMatchSkipStrategy.skipPastLastEvent())
                 .where(new SimpleCondition<DynamicShipClass>() {
@@ -75,7 +98,12 @@ public class RendezVousSimple {
                 collector.collect(str.toString());
             }
         }).writeAsText(outputFile, FileSystem.WriteMode.OVERWRITE);
-    }
+                env.execute();
+
+            }catch(Exception e){
+                System.out.println(e.getCause());
+            }
+        }
 
 
 }

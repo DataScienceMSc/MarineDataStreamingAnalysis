@@ -22,13 +22,21 @@ public class SimplePatternExecutor {
         env4.setParallelism(1);
         StreamExecutionEnvironment env5 = StreamExecutionEnvironment.getExecutionEnvironment();
         env5.setParallelism(1);
-
+        StreamExecutionEnvironment env6 = StreamExecutionEnvironment.getExecutionEnvironment();
+        env6.setParallelism(1);
+        StreamExecutionEnvironment env7 = StreamExecutionEnvironment.getExecutionEnvironment();
+        env7.setParallelism(1);
+        StreamExecutionEnvironment env8 = StreamExecutionEnvironment.getExecutionEnvironment();
+        env8.setParallelism(1);
 
         DataStream<String> kafkaStrm1 = SimpleConditionStreamGenerator.getKafkaStream(env1);
         DataStream<String> kafkaStrm2 = SimpleConditionStreamGenerator.getKafkaStream(env2);
         DataStream<String> kafkaStrm3 = SimpleConditionStreamGenerator.getKafkaStream(env3);
         DataStream<String> kafkaStrm4 = SimpleConditionStreamGenerator.getKafkaStream(env4);
         DataStream<String> kafkaStrm5 = SimpleConditionStreamGenerator.getKafkaStream(env5);
+        DataStream<String> kafkaStrm6 = SimpleConditionStreamGenerator.getKafkaStream(env6);
+        DataStream<String> kafkaStrm7 = SimpleConditionStreamGenerator.getKafkaStream(env7);
+        DataStream<String> kafkaStrm8 = SimpleConditionStreamGenerator.getKafkaStream(env8);
 
 
 
@@ -54,14 +62,18 @@ public class SimplePatternExecutor {
         Thread t5=new Thread(underWay);
         t5.start();
 
-        /*RendezVousSimple randezVous = new RendezVousSimple();
-        randezVous.outputSimpleEvents(parsedStream,"./results/randezVous.txt");
+        Drift drift = new Drift(kafkaStrm6,"./results/drift.txt",env6);
+        Thread t6=new Thread(drift);
+        t6.start();
 
-        //Drift driftShip = new Drift();
-        //driftShip.outputSimpleEvents(parsedStream, "./results/drift.txt");
 
-        Following follow = new Following();
-        follow.outputSimpleEvents(parsedStream, "./results/following.txt");*/
+        Following following = new Following(kafkaStrm7,"./results/following.txt",env7);
+        Thread t7=new Thread(following);
+        t7.start();
+
+        RendezVousSimple rendezVousSimple = new RendezVousSimple(kafkaStrm8,"./results/randezVous.txt",env7);
+        Thread t8=new Thread(rendezVousSimple);
+        t8.start();
 
         //It compiles :)
         System.out.print("Hooooray");
