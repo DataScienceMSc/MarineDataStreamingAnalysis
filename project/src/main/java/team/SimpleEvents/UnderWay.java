@@ -76,7 +76,7 @@ public class UnderWay implements Runnable {
                 System.out.println("Under Way");
                 for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
                     for (DynamicShipClass t: entry.getValue()) {
-                        str.append("Under way");
+                        str.append("Under way,");
                         str.append(t.getmmsi());
                         str.append(",");
                         str.append(t.getSpeed());
