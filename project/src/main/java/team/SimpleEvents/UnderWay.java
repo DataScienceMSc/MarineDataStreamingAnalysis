@@ -73,9 +73,10 @@ public class UnderWay implements Runnable {
             public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
                 StringBuilder str = new StringBuilder();
                 //System.out.println("here");
-                System.out.println("Match");
+                System.out.println("Under Way");
                 for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
                     for (DynamicShipClass t: entry.getValue()) {
+                        str.append("Under way");
                         str.append(t.getmmsi());
                         str.append(",");
                         str.append(t.getSpeed());

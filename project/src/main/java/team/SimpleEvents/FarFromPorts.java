@@ -57,8 +57,9 @@ public class FarFromPorts implements Runnable{
                 public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
                     StringBuilder str = new StringBuilder();
                     for (Map.Entry<String, List<DynamicShipClass>> entry : map.entrySet()) {
-                        System.out.println("Match");
+                        System.out.println("farFromPorts,");
                         for (DynamicShipClass t : entry.getValue()) {
+                            str.append("farFromPorts,");
                             str.append(t.getmmsi());
                             str.append(",");
                             str.append(t.getStatus());

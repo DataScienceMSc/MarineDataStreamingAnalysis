@@ -66,13 +66,14 @@ public class Acceleration implements Runnable{
                     StringBuilder str = new StringBuilder();
                     Integer counter=0;
                     for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
-                        System.out.println("Match");
+                        System.out.println("acceleration");
 
                         for (DynamicShipClass t: entry.getValue()) {
                             if(counter==0) {
                                 str.append(t.getmmsi());
                                 counter = counter + 1;
                             }
+                            str.append("acceleration,");
                             str.append("," + t.getLat());
                             str.append("," + t.getLon());
                         }

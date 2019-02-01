@@ -59,8 +59,9 @@ public class SlowMotion implements  Runnable{
                 public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
                     StringBuilder str = new StringBuilder();
                     for (Map.Entry<String, List<DynamicShipClass>> entry : map.entrySet()) {
-                        System.out.println("Match");
+                        System.out.println("Slow Motion");
                         for (DynamicShipClass t : entry.getValue()) {
+                            str.append("Slow Motion,");
                             str.append(t.getmmsi());
                             str.append(",   ");
                             str.append(t.getSpeed());

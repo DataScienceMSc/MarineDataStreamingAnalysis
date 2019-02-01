@@ -63,8 +63,9 @@ public class SpeedChange implements Runnable{
             public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
                 StringBuilder str = new StringBuilder();
                 for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
-                    System.out.println("Match");
+                    System.out.println("Speed Change");
                     for (DynamicShipClass t: entry.getValue()) {
+                        str.append("Speed Change,");
                         str.append(t.getmmsi());
                         str.append(",   ");
                         str.append(t.getSpeed());

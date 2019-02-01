@@ -42,7 +42,7 @@ public class Stopped {
                 select((Map<String, List<DynamicShipClass>> pattern) -> {
                     long startTime = 0;
                     long endTime = 0;
-                    System.out.println("Match Found!");
+                    System.out.println("Stopped");
                     for (Map.Entry<String, List<DynamicShipClass>> entry : pattern.entrySet()) {
                         startTime = entry.getValue().get(0).getTs();
                         endTime = entry.getValue().get(entry.getValue().size() - 1).getTs();

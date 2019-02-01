@@ -42,7 +42,6 @@ public class RendezVousSimple implements Runnable{
 
                     @Override
                     public boolean filter(DynamicShipClass value) throws Exception {
-                        System.out.println("Match stopped 1");
                         return value.getSpeed() < 0.5;
                     }
                 }).oneOrMore().consecutive().next("end").where(new IterativeCondition<DynamicShipClass>() {
@@ -55,11 +54,8 @@ public class RendezVousSimple implements Runnable{
                             contex="start";
                         }
                         for (DynamicShipClass event : ctx.getEventsForPattern(contex)) {
-                                if ((event.getTs() - value.getTs() < 10 * 60) && (event.getmmsi() != value.getmmsi()) && (value.getSpeed()<0.5))
-                                {
-                                    //System.out.println("event ts: " + event.getTs());
-                                    //System.out.println("event ts: " + value.getTs());
-                                    return true;}
+                                return ((event.getTs() - value.getTs() < 10 * 60) && (event.getmmsi()
+                                        != value.getmmsi()) && (value.getSpeed()<0.5));
                         }
                         return false;
                     }
@@ -73,8 +69,9 @@ public class RendezVousSimple implements Runnable{
             public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
                 StringBuilder str = new StringBuilder();
                 for (Map.Entry<String, List<DynamicShipClass>> entry: map.entrySet()) {
-                    System.out.println("Match");
+                    System.out.println("Rendez Vouz,");
                     for (DynamicShipClass t: entry.getValue()) {
+                        str.append("Rendez Vouz,");
                         str.append(t.getmmsi());
                         str.append(",   ");
                         str.append(t.getSpeed());

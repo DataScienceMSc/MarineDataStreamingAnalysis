@@ -42,7 +42,7 @@ public class LowSpeed {
                     long endTime= 0;
                     double speed = 0.0;
                     int counter = 0;
-                    System.out.println("Match");
+                    System.out.println("Low Speed,");
                     for (Map.Entry<String, List<DynamicShipClass>> entry: pattern.entrySet()) {
                         for(DynamicShipClass t: entry.getValue()) {
                             speed = speed + t.getSpeed();

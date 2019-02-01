@@ -43,7 +43,7 @@ public class Gaps {
                 });
 
         DataStream<SimpleEvent> gapStream = CEP.pattern(parsedStream, gap).select((Map<String, List<DynamicShipClass>> pattern) -> {
-            System.out.println("Gap Found!");
+            System.out.println("Gap");
             long startTime=pattern.get("startGap").get(0).getTs();
             long endTime=pattern.get("end").get(0).getTs();
             DynamicShipClass temp=pattern.get("startGap").get(0);

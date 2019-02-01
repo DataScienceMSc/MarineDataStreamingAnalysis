@@ -35,7 +35,7 @@ public class NaturaAreas {
 
             DataStream<SimpleEvent> natura = CEP.pattern(parsedStream, naturaAreas).
                     select((Map<String, List<DynamicShipClass>> pattern) -> {
-                        System.out.println("Match Found!");
+                        System.out.println("Natura Areas,");
                         long startTime=pattern.get("Natura").get(0).getTs();
                         long endTime=pattern.get("Natura").get(0).getTs();
                         double lat = pattern.get("Natura").get(0).getLat();
