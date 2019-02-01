@@ -71,7 +71,7 @@ public class SimplePatternExecutor {
         Thread t7=new Thread(following);
         t7.start();
 
-        RendezVousSimple rendezVousSimple = new RendezVousSimple(kafkaStrm8,"./results/randezVous.txt",env7);
+        RendezVousSimple rendezVousSimple = new RendezVousSimple(kafkaStrm8,"./results/randezVous.txt",env8);
         Thread t8=new Thread(rendezVousSimple);
         t8.start();
 

@@ -18,7 +18,7 @@ public class Gaps {
     public static DataStream<SimpleEvent> generateSimpleEvents(DataStream<DynamicShipClass> parsedStream) throws Exception {
 
 
-        Pattern<DynamicShipClass, DynamicShipClass> increasingSpeed = Pattern.<DynamicShipClass>begin("startGap")
+        Pattern<DynamicShipClass, DynamicShipClass> gap = Pattern.<DynamicShipClass>begin("startGap")
                 .where(new SimpleCondition<DynamicShipClass>() {
 
                     @Override
@@ -42,7 +42,7 @@ public class Gaps {
                     }
                 });
 
-        DataStream<SimpleEvent> gapStream = CEP.pattern(parsedStream, increasingSpeed).select((Map<String, List<DynamicShipClass>> pattern) -> {
+        DataStream<SimpleEvent> gapStream = CEP.pattern(parsedStream, gap).select((Map<String, List<DynamicShipClass>> pattern) -> {
             System.out.println("Gap Found!");
             long startTime=pattern.get("startGap").get(0).getTs();
             long endTime=pattern.get("end").get(0).getTs();

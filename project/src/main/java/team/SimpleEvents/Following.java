@@ -37,13 +37,7 @@ public class Following implements Runnable{
         try{
             DataStream<DynamicShipClass> parsedStream = inputStream
                     .map(line -> DynamicShipClass.fromString(line))
-                    .assignTimestampsAndWatermarks(new AscendingTimestampExtractor<DynamicShipClass>() {
-                        @Override
-                        public long extractAscendingTimestamp(DynamicShipClass element) {
-                            return element.getEventTime();
-                        }
-
-                    });
+                    .keyBy(DynamicShipClass::getmmsi);
 
         Pattern<DynamicShipClass, DynamicShipClass> following = Pattern.<DynamicShipClass>begin("start", AfterMatchSkipStrategy.skipPastLastEvent())
                 .where(new SimpleCondition<DynamicShipClass>() {
@@ -65,7 +59,6 @@ public class Following implements Runnable{
                         for (DynamicShipClass event : ctx.getEventsForPattern(contex)) {
                                 if ((abs(event.getTs() - value.getTs()) < 2 * 60) && (event.getmmsi() != value.getmmsi()) && ((value.getSpeed() - event.getSpeed()) > 5.0))
                                 {
-                                    System.out.println("MAtch following 2");
                                     System.out.println("event ts: " + event.getTs());
                                     System.out.println("value ts: " + value.getTs());
                                     return true;}

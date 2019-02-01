@@ -35,13 +35,7 @@ public class RendezVousSimple implements Runnable{
             try{
                 DataStream<DynamicShipClass> parsedStream = inputStream
                         .map(line -> DynamicShipClass.fromString(line))
-                        .assignTimestampsAndWatermarks(new AscendingTimestampExtractor<DynamicShipClass>() {
-                            @Override
-                            public long extractAscendingTimestamp(DynamicShipClass element) {
-                                return element.getEventTime();
-                            }
-
-                        });
+                        .keyBy(DynamicShipClass::getmmsi);
 
         Pattern<DynamicShipClass, DynamicShipClass> stoppedShip = Pattern.<DynamicShipClass>begin("start", AfterMatchSkipStrategy.skipPastLastEvent())
                 .where(new SimpleCondition<DynamicShipClass>() {

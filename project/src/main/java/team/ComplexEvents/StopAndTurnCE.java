@@ -30,7 +30,7 @@ public class StopAndTurnCE implements Runnable {
     public void run(){
         try {
 
-            Pattern<SimpleEvent, ?> complex = Pattern.<SimpleEvent>begin("start")
+            Pattern<SimpleEvent, ?> stopAndTurn = Pattern.<SimpleEvent>begin("start")
                     .subtype(StoppedEvent.class)
                     .where(new SimpleCondition<StoppedEvent>() {
 
@@ -50,7 +50,7 @@ public class StopAndTurnCE implements Runnable {
                     });
 
 
-            CEP.pattern(parsedStream, complex).flatSelect(new PatternFlatSelectFunction<SimpleEvent, String>() {
+            CEP.pattern(parsedStream, stopAndTurn).flatSelect(new PatternFlatSelectFunction<SimpleEvent, String>() {
 
                 @Override
                 public void flatSelect(Map<String, List<SimpleEvent>> map, Collector<String> collector) throws Exception {

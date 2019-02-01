@@ -33,15 +33,9 @@ public class SlowMotion implements  Runnable{
         try {
             DataStream<DynamicShipClass> parsedStream = inputStream
                     .map(line -> DynamicShipClass.fromString(line))
-                    .assignTimestampsAndWatermarks(new AscendingTimestampExtractor<DynamicShipClass>() {
-                        @Override
-                        public long extractAscendingTimestamp(DynamicShipClass element) {
-                            return element.getEventTime();
-                        }
+                    .keyBy(DynamicShipClass::getmmsi);
 
-                    });
-
-            Pattern<DynamicShipClass, DynamicShipClass> increasingSpeed = Pattern.<DynamicShipClass>begin("startSlowMotion", AfterMatchSkipStrategy.skipPastLastEvent())
+            Pattern<DynamicShipClass, DynamicShipClass> slowMotion = Pattern.<DynamicShipClass>begin("startSlowMotion", AfterMatchSkipStrategy.skipPastLastEvent())
                     .where(new SimpleCondition<DynamicShipClass>() {
 
                         @Override
@@ -59,7 +53,7 @@ public class SlowMotion implements  Runnable{
                     }).timesOrMore(9).greedy().consecutive();
 
 
-            CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
+            CEP.pattern(parsedStream, slowMotion).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
 
                 @Override
                 public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {

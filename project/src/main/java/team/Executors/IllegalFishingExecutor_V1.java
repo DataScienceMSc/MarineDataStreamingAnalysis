@@ -20,7 +20,8 @@ public class IllegalFishingExecutor_V1 {
         TextInputFormat format = new TextInputFormat(new org.apache.flink.core.fs.Path(path));
         DataStream<java.lang.String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
 
-        DataStream<DynamicShipClass> parsedStream= inputStream.map(line -> DynamicShipClass.fromString(line)).keyBy(element -> element.getmmsi());
+        DataStream<DynamicShipClass> parsedStream= inputStream.map(line -> DynamicShipClass.fromString(line)).
+                keyBy(element -> element.getmmsi());
 
 
         //Generating the streams

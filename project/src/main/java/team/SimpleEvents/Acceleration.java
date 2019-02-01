@@ -34,16 +34,9 @@ public class Acceleration implements Runnable{
     public void run(){
         try{
             DataStream<DynamicShipClass> parsedStream = inputStream
-                    .map(line -> DynamicShipClass.fromString(line))
-                    .assignTimestampsAndWatermarks(new AscendingTimestampExtractor<DynamicShipClass>() {
-                        @Override
-                        public long extractAscendingTimestamp(DynamicShipClass element) {
-                            return element.getEventTime();
-                        }
+                    .map(line -> DynamicShipClass.fromString(line)).keyBy(DynamicShipClass::getmmsi);
 
-                    });
-
-               Pattern<DynamicShipClass, DynamicShipClass> increasingSpeed = Pattern.<DynamicShipClass>begin("start")
+               Pattern<DynamicShipClass, DynamicShipClass> acc = Pattern.<DynamicShipClass>begin("start")
                     .where(new SimpleCondition<DynamicShipClass>() {
 
                         @Override
@@ -66,7 +59,7 @@ public class Acceleration implements Runnable{
                         }
                     });
 
-            CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
+            CEP.pattern(parsedStream, acc).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
 
                 @Override
                 public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {

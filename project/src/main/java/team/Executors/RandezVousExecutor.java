@@ -22,7 +22,8 @@ public class RandezVousExecutor {
         TextInputFormat format = new TextInputFormat(new org.apache.flink.core.fs.Path(path));
         DataStream<java.lang.String> inputStream = env.readFile(format, path, FileProcessingMode.PROCESS_CONTINUOUSLY, 100);
 
-        DataStream<DynamicShipClass> parsedStream= inputStream.map(line -> DynamicShipClass.fromString(line)).keyBy(element -> element.getGridId());
+        DataStream<DynamicShipClass> parsedStream= inputStream.map(line -> DynamicShipClass.fromString(line)).
+                keyBy(element -> element.getGridId());
         //to run randezVous pattern change to element.getGridId()
 
 

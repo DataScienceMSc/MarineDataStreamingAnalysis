@@ -33,7 +33,7 @@ public class SuspiciousStopsCE implements Runnable{
 
     public void run(){
         try {
-            Pattern<SimpleEvent, ?> complex = Pattern.<SimpleEvent>begin("start")
+            Pattern<SimpleEvent, ?> suscpiciousTurn = Pattern.<SimpleEvent>begin("start")
                     .subtype(StoppedEvent.class)
                     .where(new SimpleCondition<StoppedEvent>() {
 
@@ -52,7 +52,7 @@ public class SuspiciousStopsCE implements Runnable{
                         }
                     });
 
-            CEP.pattern(this.parsedStream, complex).flatSelect(new PatternFlatSelectFunction<SimpleEvent, String>() {
+            CEP.pattern(this.parsedStream, suscpiciousTurn).flatSelect(new PatternFlatSelectFunction<SimpleEvent, String>() {
 
                 public void flatSelect(Map<String, List<SimpleEvent>> map, Collector<String> collector) throws Exception {
                     StringBuilder str = new StringBuilder();

@@ -8,7 +8,6 @@ import org.apache.flink.cep.pattern.conditions.SimpleCondition;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExtractor;
 import org.apache.flink.util.Collector;
 import team.General.DynamicShipClass;
 import team.General.GeoUtils;
@@ -39,16 +38,11 @@ public class FarFromPorts implements Runnable{
 
             DataStream<DynamicShipClass> parsedStream = inputStream
                     .map(line -> DynamicShipClass.fromString(line,geo))
-                    .assignTimestampsAndWatermarks(new AscendingTimestampExtractor<DynamicShipClass>() {
-                        @Override
-                        public long extractAscendingTimestamp(DynamicShipClass element) {
-                            return element.getEventTime();
-                        }
-
-                    });
+                    .keyBy(DynamicShipClass::getmmsi);
 
             ArrayList<Integer> portsOfBrittany = geo.latlonToGrid("./inputFiles/latlon.csv");
-            Pattern<DynamicShipClass, DynamicShipClass> increasingSpeed = Pattern.<DynamicShipClass>begin("openSea", AfterMatchSkipStrategy.skipPastLastEvent())
+
+            Pattern<DynamicShipClass, DynamicShipClass> farFromPorts = Pattern.<DynamicShipClass>begin("openSea", AfterMatchSkipStrategy.skipPastLastEvent())
                     .where(new SimpleCondition<DynamicShipClass>() {
 
                         @Override
@@ -57,7 +51,7 @@ public class FarFromPorts implements Runnable{
                         }
                     });
 
-            CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
+            CEP.pattern(parsedStream, farFromPorts).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
 
                 @Override
                 public void flatSelect(Map<String, List<DynamicShipClass>> map, Collector<String> collector) throws Exception {
