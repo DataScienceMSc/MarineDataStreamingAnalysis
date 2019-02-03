@@ -37,7 +37,7 @@ public class Following implements Runnable{
         try{
             DataStream<DynamicShipClass> parsedStream = inputStream
                     .map(line -> DynamicShipClass.fromString(line))
-                    .keyBy(DynamicShipClass::getmmsi);
+                    .keyBy(DynamicShipClass::getGridId);
 
         Pattern<DynamicShipClass, DynamicShipClass> following = Pattern.<DynamicShipClass>begin("start", AfterMatchSkipStrategy.skipPastLastEvent())
                 .where(new SimpleCondition<DynamicShipClass>() {
