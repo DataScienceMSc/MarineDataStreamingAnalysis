@@ -94,6 +94,10 @@ public class Drift implements Runnable{
                         str.append(t.getLat());
                         str.append(",   ");
                         str.append(t.getLon());
+                        str.append(",   ");
+                        str.append(t.getCourse());
+                        str.append(",   ");
+                        str.append(t.getHeading());
                         str.append("\n");
                     }
                 }

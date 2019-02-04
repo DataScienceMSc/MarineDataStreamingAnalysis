@@ -57,7 +57,7 @@ public class Following implements Runnable{
                             contex="start";
                         }
                         for (DynamicShipClass event : ctx.getEventsForPattern(contex)) {
-                                if ((abs(event.getTs() - value.getTs()) < 2 * 60) && (event.getmmsi() != value.getmmsi()) && ((value.getSpeed() - event.getSpeed()) > 5.0))
+                                if ((abs(event.getTs() - value.getTs()) < 2 * 60) && (event.getmmsi() != value.getmmsi()) && ((value.getSpeed() - event.getSpeed()) > 5.0) && (abs((value.getCourse() - event.getCourse())) <= 5.0))
                                 {
                                     System.out.println("event ts: " + event.getTs());
                                     System.out.println("value ts: " + value.getTs());
