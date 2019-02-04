@@ -6,13 +6,17 @@ public abstract class SimpleEvent {
     private long tsStart;
     private long tsEnd;
     private int gridId;
+    private double lat;
+    private double lon;
 
 
-    public SimpleEvent(int mmsi, long tsStart, long tsEnd, int gridId) {
+    public SimpleEvent(int mmsi, long tsStart, long tsEnd, int gridId, double lat, double lon ) {
         this.mmsi = mmsi;
         this.tsStart = tsStart;
         this.tsEnd = tsEnd;
         this.gridId = gridId;
+        this.lat=lat;
+        this.lon=lon;
     }
 
     public int getMmsi() {
@@ -30,6 +34,10 @@ public abstract class SimpleEvent {
     public int getGridId() {
         return gridId;
     }
+
+    public double getLat(){return lat;}
+
+    public double getLon(){return lon;}
 
     @Override
     public int hashCode() {

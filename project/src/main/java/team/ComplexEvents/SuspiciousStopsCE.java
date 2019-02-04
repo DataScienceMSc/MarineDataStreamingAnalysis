@@ -57,14 +57,11 @@ public class SuspiciousStopsCE implements Runnable{
                 public void flatSelect(Map<String, List<SimpleEvent>> map, Collector<String> collector) throws Exception {
                     StringBuilder str = new StringBuilder();
                     for (Map.Entry<String, List<SimpleEvent>> entry : map.entrySet()) {
-                        System.out.println(map.entrySet());
+                        System.out.println("Suspicious Stop ");
                         for (SimpleEvent t : entry.getValue()) {
-                            //Do we really need this for loop here?
-                            System.out.println("Writing");
-                            str.append(t.getMmsi());
-                            str.append(", " + t.getTsStart());
-                            str.append(", " + t.getTsEnd());
-                            str.append(", " + t.getGridId());
+                            str.append(t.getMmsi()+",");
+                            str.append(t.getLat()+",");
+                            str.append(t.getLon()+",");
                             str.append("\n");
                         }
                     }

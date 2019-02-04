@@ -5,8 +5,8 @@ import java.util.Objects;
 public class LowSpeedEvent extends SimpleEvent {
     private double speed;
 
-    public LowSpeedEvent(int mmsi, long tsStart, long tsEnd, int gridId, double speed) {
-        super(mmsi, tsStart, tsEnd, gridId);
+    public LowSpeedEvent(int mmsi, long tsStart, long tsEnd, int gridId, double speed, double lat, double lon) {
+        super(mmsi, tsStart, tsEnd, gridId, lat, lon);
         this.speed = speed;
     }
 

@@ -57,10 +57,9 @@ public class StopAndTurnCE implements Runnable {
                     StringBuilder str = new StringBuilder();
                     for (Map.Entry<String, List<SimpleEvent>> entry : map.entrySet()) {
                         for (SimpleEvent t : entry.getValue()) {
-                            str.append(t.getMmsi());
-                            str.append(", " + t.getTsStart());
-                            str.append(", " + t.getTsEnd());
-                            str.append(", " + t.getGridId());
+                            str.append(t.getMmsi()+",");
+                            str.append(t.getLat()+",");
+                            str.append(t.getLon()+",");
                             str.append("\n");
                         }
                     }

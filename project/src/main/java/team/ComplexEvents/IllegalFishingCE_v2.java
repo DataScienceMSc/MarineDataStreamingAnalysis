@@ -55,8 +55,10 @@ public class IllegalFishingCE_v2 implements Runnable {
                 StringBuilder str = new StringBuilder();
                 for (Map.Entry<String, List<SimpleEvent>> entry: map.entrySet()) {
                     for (SimpleEvent t: entry.getValue()) {
-                        str.append(t.getMmsi());
-                    }
+                        str.append(t.getMmsi()+",");
+                        str.append(t.getLat()+",");
+                        str.append(t.getLon()+",");
+                        str.append("\n");              }
                 }
                 collector.collect(str.toString());
             }

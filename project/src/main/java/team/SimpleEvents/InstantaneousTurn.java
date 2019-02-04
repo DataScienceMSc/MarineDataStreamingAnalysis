@@ -55,7 +55,8 @@ public class InstantaneousTurn {
                         degrees = Math.abs(entry.getValue().get(0).getHeading() - entry.getValue().get(entry.getValue().size() - 1).getHeading());
                     }
                     DynamicShipClass temp = pattern.get("start").get(0);
-                    return new InstantaneousTurnEvent(temp.getmmsi(), startTime, endTime, temp.getGridId(), degrees);
+                    return new InstantaneousTurnEvent(temp.getmmsi(), startTime, endTime, temp.getGridId()
+                            , degrees,temp.getLat(), temp.getLon());
                 });
 
         return turn;

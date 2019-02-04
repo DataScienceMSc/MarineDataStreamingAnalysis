@@ -53,7 +53,8 @@ public class LowSpeed {
                     }
                     speed = speed/counter;
                     DynamicShipClass temp=pattern.get("lowStart").get(0);
-                    return new LowSpeedEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(),speed);
+                    return new LowSpeedEvent(temp.getmmsi(),startTime,endTime,temp.getGridId(),
+                            speed,temp.getLat(), temp.getLon());
                 });
         return lowspeed;
 

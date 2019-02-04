@@ -6,22 +6,13 @@ public class StoppedEvent extends SimpleEvent {
 
     private double speed;
 
-    public StoppedEvent(int mmsi, long TsStart,long TsEnd, int gridId, double speed) {
-        super(mmsi, TsStart,TsEnd, gridId);
+    public StoppedEvent(int mmsi, long TsStart,long TsEnd, int gridId, double speed, double lat, double lon) {
+        super(mmsi, TsStart, TsEnd, gridId, lat, lon);
         this.speed = speed;
-    }
-
-    public StoppedEvent() {
-        super(0, 0, 0,0);
-        this.speed = 0;
     }
 
     public double getSpeed() {
         return speed;
-    }
-
-    public void setSpeed(double speed) {
-        this.speed = speed;
     }
 
     @Override

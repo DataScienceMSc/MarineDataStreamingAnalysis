@@ -5,8 +5,8 @@ import java.util.Objects;
 public class GapEvent extends SimpleEvent {
     long duration;
 
-    public GapEvent(int mmsi, long tsStart, long tsEnd, int gridId, long duration) {
-        super(mmsi, tsStart, tsEnd, gridId);
+    public GapEvent(int mmsi, long tsStart, long tsEnd, int gridId, long duration, double lat, double lon) {
+        super(mmsi, tsStart, tsEnd, gridId, lat, lon);
         this.duration = duration;
     }
 

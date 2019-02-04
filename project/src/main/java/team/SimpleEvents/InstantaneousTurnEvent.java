@@ -5,8 +5,8 @@ import java.util.Objects;
 public class InstantaneousTurnEvent extends SimpleEvent {
     private int degrees;
 
-    public InstantaneousTurnEvent(int mmsi, long tsStart, long tsEnd, int gridId, int degrees) {
-        super(mmsi, tsStart, tsEnd, gridId);
+    public InstantaneousTurnEvent(int mmsi, long tsStart, long tsEnd, int gridId, int degrees, double lat, double lon) {
+        super(mmsi, tsStart, tsEnd, gridId, lat, lon);
         this.degrees = degrees;
     }
 

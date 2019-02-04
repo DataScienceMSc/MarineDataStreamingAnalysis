@@ -47,7 +47,8 @@ public class Gaps {
             long startTime=pattern.get("startGap").get(0).getTs();
             long endTime=pattern.get("end").get(0).getTs();
             DynamicShipClass temp=pattern.get("startGap").get(0);
-            return new GapEvent(temp.getmmsi(), startTime, endTime, temp.getGridId(), (startTime - endTime));
+            return new GapEvent(temp.getmmsi(), startTime, endTime, temp.getGridId(), (startTime - endTime)
+                    ,temp.getLat(), temp.getLon());
 
         });
         return gapStream;

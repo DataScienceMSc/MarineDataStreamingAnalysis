@@ -48,7 +48,8 @@ public class Stopped {
                         endTime = entry.getValue().get(entry.getValue().size() - 1).getTs();
                     }
                     DynamicShipClass temp = pattern.get("start").get(0);
-                    return new StoppedEvent(temp.getmmsi(), startTime, endTime, temp.getGridId(), temp.getSpeed());
+                    return new StoppedEvent(temp.getmmsi(), startTime, endTime, temp.getGridId(),
+                            temp.getSpeed(),temp.getLat(), temp.getLon());
                 });
         return stopped;
     }
