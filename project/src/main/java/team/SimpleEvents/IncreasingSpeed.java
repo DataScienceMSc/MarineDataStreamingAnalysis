@@ -58,7 +58,7 @@ public class IncreasingSpeed implements  Runnable{
                         }
                         return false;
                     }
-                }).oneOrMore().greedy().consecutive();
+                }).timesOrMore(5).greedy().consecutive();
 
         CEP.pattern(parsedStream, increasingSpeed).flatSelect(new PatternFlatSelectFunction<DynamicShipClass, String>() {
 
