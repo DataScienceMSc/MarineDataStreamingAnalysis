@@ -47,14 +47,6 @@ public class UnderWay implements Runnable {
                         return value.getSpeed()>=2.7 && value.getSpeed()<50.;
                     }
                 })
-                .next("middle")
-                .where(new SimpleCondition<DynamicShipClass>() {
-
-                    @Override
-                    public boolean filter(DynamicShipClass value) throws Exception {
-                        return value.getSpeed()>=2.7 && value.getSpeed()<50.;
-                    }
-                })
                 .oneOrMore().greedy().consecutive()
                 .next("lowEnd")
                 .where(new IterativeCondition<DynamicShipClass>() {

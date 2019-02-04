@@ -31,7 +31,7 @@ public class GeoUtils implements Serializable {
 	/**
 	 * Maps a location specified by latitude and longitude values to a cell of a
 	 * grid covering the area of Brest
-	 * The grid cells are roughly 300 x 300 m and sequentially number from north-west
+	 * The grid cells are roughly 500 x 500 m and sequentially number from north-west
 	 * to south-east starting by zero.
 	 *
 	 * @param lon longitude of the location to map
